@@ -22,3 +22,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# dependencies
+node_modules/
+
+# production build
+dist/
+
+# local env files
+.env.local
+.env.*
+!.env.example
