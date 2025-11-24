@@ -1,5 +1,6 @@
 // src/components/Dashboard.tsx
-import { useEffect, useState, FormEvent } from "react";
+import { useEffect, useState } from "react";
+import type { FormEvent } from "react";
 import {
   getNextSession,
   logWorkout,
