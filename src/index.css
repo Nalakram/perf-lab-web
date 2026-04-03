@@ -143,6 +143,22 @@
     border-radius: var(--pl-radius);
     @apply border border-slate-800/50 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 p-5 text-slate-200 shadow-2xl shadow-slate-900/40;
   }
+
+  .tab-pill-active {
+    @apply border border-teal-200/80 bg-white shadow-md shadow-slate-900/5 ring-1 ring-teal-500/10;
+  }
+
+  .details-disclosure > summary {
+    list-style: none;
+  }
+
+  .details-disclosure > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  details.details-disclosure[open] > summary .details-chevron {
+    transform: rotate(225deg);
+  }
 }
 
 @layer utilities {

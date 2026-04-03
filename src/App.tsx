@@ -1,14 +1,22 @@
 ﻿// src/App.tsx
+import { useId, useState } from "react";
 import "./App.css";
 import "./index.css";
 import { AuthStrip } from "./components/AuthStrip";
 import { DigitalTwinPanel } from "./components/DigitalTwinPanel";
+import { EngineExplainer } from "./components/EngineExplainer";
 import { HeroFlowColumn } from "./components/HeroFlowColumn";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL as string;
 
+type MainTab = "field" | "twin";
+
 function App() {
   const year = new Date().getFullYear();
+  const [mainTab, setMainTab] = useState<MainTab>("field");
+  const tabListId = useId();
+  const fieldTabId = `${tabListId}-field`;
+  const twinTabId = `${tabListId}-twin`;
 
   return (
     <div className="app-shell">
@@ -34,56 +42,99 @@ function App() {
           </div>
 
           <div className="flex w-full flex-col gap-4 lg:w-auto lg:min-w-[min(100%,20rem)] lg:items-end">
-            <div className="flex w-full flex-wrap items-center justify-between gap-3 lg:justify-end">
+            <div className="flex w-full flex-wrap items-center justify-end gap-3">
               <div className="flex flex-wrap gap-2">
                 <span className="pill-accent badge-dot">VO₂ Lab</span>
                 <span className="pill-muted">Digital Twin</span>
               </div>
-              <code className="max-w-full truncate rounded-lg border border-slate-200/80 bg-slate-50 px-2 py-1 text-[0.65rem] text-slate-500">
-                {API_BASE}
-              </code>
             </div>
             <AuthStrip />
           </div>
         </div>
       </header>
 
-      <main className="app-grid">
-        <HeroFlowColumn apiBase={API_BASE} />
-        <DigitalTwinPanel />
+      <div
+        className="glass-card-dense flex flex-col gap-1 border border-slate-200/80 p-1.5 sm:flex-row"
+        role="tablist"
+        aria-label="Workspace"
+      >
+        <button
+          type="button"
+          role="tab"
+          id={fieldTabId}
+          aria-selected={mainTab === "field"}
+          aria-controls="main-workspace-panel"
+          tabIndex={mainTab === "field" ? 0 : -1}
+          className={`tab-pill flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${
+            mainTab === "field"
+              ? "tab-pill-active text-teal-950 shadow-sm"
+              : "text-slate-600 hover:bg-slate-100/80"
+          }`}
+          onClick={() => setMainTab("field")}
+        >
+          Field test
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id={twinTabId}
+          aria-selected={mainTab === "twin"}
+          aria-controls="main-workspace-panel"
+          tabIndex={mainTab === "twin" ? 0 : -1}
+          className={`tab-pill flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${
+            mainTab === "twin"
+              ? "tab-pill-active text-teal-950 shadow-sm"
+              : "text-slate-600 hover:bg-slate-100/80"
+          }`}
+          onClick={() => setMainTab("twin")}
+        >
+          Digital twin
+        </button>
+      </div>
+
+      <EngineExplainer />
+
+      <main>
+        <div
+          id="main-workspace-panel"
+          role="tabpanel"
+          aria-labelledby={mainTab === "field" ? fieldTabId : twinTabId}
+        >
+          {mainTab === "field" ? (
+            <HeroFlowColumn apiBase={API_BASE} />
+          ) : (
+            <DigitalTwinPanel />
+          )}
+        </div>
       </main>
 
-      <section>
-        <div className="glass-card relative overflow-hidden border-teal-100/80">
-          <div
-            className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-teal-400/15 blur-3xl"
-            aria-hidden
-          />
-          <p className="section-label">How the engine thinks</p>
-          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-slate-600">
-            perf-lab-api maintains a unified internal state <code className="rounded bg-slate-100 px-1 py-0.5 text-xs text-slate-800">S(t)</code>{" "}
-            and applies stress doses <code className="rounded bg-slate-100 px-1 py-0.5 text-xs text-slate-800">D(t)</code> for every workout you
-            log. Over time, it updates your systems on multiple time scales –
-            fast fatigue, slower fitness, and deeper structural changes –
-            instead of following a static plan.
-          </p>
-          <p className="mt-3 text-xs text-slate-500">
-            These panels read live state, doses, and adaptive prescriptions from
-            your own twin so you can see why the next session was chosen.
-          </p>
+      <footer className="flex flex-col gap-3 border-t border-slate-200/60 pt-8 text-xs text-slate-500">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span className="font-medium text-slate-600">perf-lab-web</span>
+          <span className="hidden text-slate-300 sm:inline" aria-hidden>
+            ·
+          </span>
+          <span>{year}</span>
+          <span className="hidden text-slate-300 sm:inline" aria-hidden>
+            ·
+          </span>
+          <span>Built by Nalakram · React + FastAPI · perf-lab-api</span>
         </div>
-      </section>
-
-      <footer className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-slate-200/60 pt-8 text-xs text-slate-500">
-        <span className="font-medium text-slate-600">perf-lab-web</span>
-        <span className="hidden text-slate-300 sm:inline" aria-hidden>
-          ·
-        </span>
-        <span>{year}</span>
-        <span className="hidden text-slate-300 sm:inline" aria-hidden>
-          ·
-        </span>
-        <span>Built by Nalakram · React + FastAPI · perf-lab-api</span>
+        <details className="details-disclosure rounded-xl border border-slate-200/80 bg-slate-50/50 px-3 py-2">
+          <summary className="cursor-pointer font-medium text-slate-600 [&::-webkit-details-marker]:hidden">
+            API endpoint
+            <span
+              className="details-chevron ml-2 inline-block h-2 w-2 rotate-45 border-r-2 border-b-2 border-slate-400 align-middle transition-transform duration-200"
+              aria-hidden
+            />
+          </summary>
+          <code className="mt-2 block break-all rounded-lg border border-slate-200/80 bg-white px-2 py-1.5 text-[0.65rem] text-slate-600">
+            {API_BASE}
+          </code>
+          {import.meta.env.DEV ? (
+            <p className="mt-1 text-[0.65rem] text-teal-700">Development build</p>
+          ) : null}
+        </details>
       </footer>
     </div>
   );

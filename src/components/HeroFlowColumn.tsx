@@ -1,5 +1,6 @@
 // src/components/HeroFlowColumn.tsx
 import { useEffect, useState } from "react";
+import { PageSection } from "./PageSection";
 
 type Zone = {
   name: string;
@@ -27,6 +28,59 @@ function formatMMSS(sec: number) {
   const m = Math.floor(sec / 60);
   const s = Math.round(sec % 60);
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+function HeroStepper() {
+  const steps = [
+    {
+      n: 1,
+      title: "Enter your tactical test",
+      body: "300 m and 1.5 mile times, age, and sex.",
+      active: true,
+    },
+    {
+      n: 2,
+      title: "See VO₂, zones, fatigue",
+      body: "VO₂ band, 1.5-mile category, pace zones.",
+      active: false,
+    },
+    {
+      n: 3,
+      title: "Log sessions into S(t)",
+      body: "Use the Digital twin tab to evolve internal state.",
+      active: false,
+    },
+  ];
+
+  return (
+    <div className="glass-card-dense mb-1 border border-slate-200/80">
+      <p className="section-label">Hero flow</p>
+      <div className="mt-3 flex flex-col gap-4 sm:mt-4 sm:flex-row sm:gap-3">
+        {steps.map((s) => (
+          <div
+            key={s.n}
+            className="flex min-w-0 flex-1 items-start gap-2.5 sm:flex-col sm:items-stretch sm:gap-2"
+          >
+            <div
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-bold ${
+                s.active
+                  ? "border-teal-300/80 bg-teal-50 text-teal-800 ring-1 ring-teal-500/15"
+                  : "border-slate-200 bg-slate-50 text-slate-600"
+              }`}
+            >
+              {s.n}
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-slate-800">{s.title}</p>
+              <p className="mt-0.5 text-[0.7rem] leading-snug text-slate-500">
+                {s.body}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
@@ -76,67 +130,25 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
     }
   }
 
-  // initial compute on mount (keeps legacy behavior)
+  // Remounting this tab triggers a fresh compute (see App tab switch).
   useEffect(() => {
     computeMetrics();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-
-
   return (
-    <section className="space-y-4">
-        <div className="feature-dark mb-1">
-          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-teal-300/90">
-            Hero Flow
-          </p>
-          <div className="mt-4 flex flex-col gap-4 text-sm">
-            <div className="flex items-start gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-teal-400/50 bg-teal-500/15 text-xs font-bold text-teal-200">
-                1
-              </div>
-              <div>
-                <p className="font-semibold text-white">Enter your tactical test</p>
-                <p className="mt-0.5 text-sm text-slate-400">
-                  300 m and 1.5 mile times, age, and sex.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-600 bg-slate-800/80 text-xs font-bold text-slate-300">
-                2
-              </div>
-              <div>
-                <p className="font-semibold text-white">See VO₂, zones, fatigue</p>
-                <p className="mt-0.5 text-sm text-slate-400">
-                  Get your VO₂ band, 1.5-mile category, and pace zones.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-600 bg-slate-800/80 text-xs font-bold text-slate-300">
-                3
-              </div>
-              <div>
-                <p className="font-semibold text-white">Log sessions into S(t)</p>
-                <p className="mt-0.5 text-sm text-slate-400">
-                  Feed the digital twin and see how your internal state evolves.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="space-y-4">
+      <HeroStepper />
 
-      {/* Inputs card */}
-      <section className="glass-card card-hover relative overflow-hidden">
+      <PageSection
+        eyebrow="Tactical Field Test"
+        title="Build your profile from one 300m + 1.5 mile"
+        contentClassName="card-hover relative overflow-hidden"
+      >
         <div
           className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-teal-500 via-teal-400 to-indigo-400"
           aria-hidden
         />
-        <p className="section-label">Tactical Field Test</p>
-        <h2 className="mt-2 text-base font-semibold text-slate-900">
-          Build your profile from one 300m + 1.5 mile
-        </h2>
 
         <form
           onSubmit={computeMetrics}
@@ -203,17 +215,19 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
         </form>
 
         {metricsError && (
-          <p className="mt-3 text-xs text-rose-400">
-            Error: {metricsError}. Check base URL and try again.
+          <p className="mt-3 text-xs text-rose-600">
+            Error: {metricsError}. Check API endpoint in the footer and try again.
           </p>
         )}
-      </section>
+      </PageSection>
 
-      {/* Snapshot metrics */}
-      <section className="grid gap-4 text-sm md:grid-cols-3">
+      <PageSection variant="plain" className="grid gap-4 text-sm md:grid-cols-3">
         <div className="glass-card relative overflow-hidden pt-6">
-          <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-teal-500 to-teal-300" aria-hidden />
-          <h2 className="metric-heading mb-1 text-xs">VO₂ Max</h2>
+          <div
+            className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-teal-500 to-teal-300"
+            aria-hidden
+          />
+          <h3 className="metric-heading mb-1 text-xs">VO₂ Max</h3>
           <p className="metric-value">
             {metrics ? metrics.vo2_max.toFixed(1) : "–"}
           </p>
@@ -223,8 +237,11 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
         </div>
 
         <div className="glass-card relative overflow-hidden pt-6">
-          <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-indigo-500 to-violet-400" aria-hidden />
-          <h2 className="metric-heading mb-1 text-xs">1.5 mile result</h2>
+          <div
+            className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-indigo-500 to-violet-400"
+            aria-hidden
+          />
+          <h3 className="metric-heading mb-1 text-xs">1.5 mile result</h3>
           <p className="metric-value">
             {metrics
               ? `${formatMMSS(metrics.race_pace_sec_per_mile)} /mi`
@@ -236,8 +253,11 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
         </div>
 
         <div className="glass-card relative overflow-hidden pt-6">
-          <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-amber-500 to-orange-400" aria-hidden />
-          <h2 className="metric-heading mb-1 text-xs">Fatigue profile</h2>
+          <div
+            className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-amber-500 to-orange-400"
+            aria-hidden
+          />
+          <h3 className="metric-heading mb-1 text-xs">Fatigue profile</h3>
           <p className="metric-value">
             {metrics ? `${metrics.fatigue_percent.toFixed(1)}%` : "–"}
           </p>
@@ -245,13 +265,12 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
             {metrics ? metrics.fatigue_profile : "Speed / endurance mix"}
           </p>
         </div>
-      </section>
+      </PageSection>
 
-      {/* Coach summary */}
-      <section className="glass-card text-sm">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-          Coach Summary
-        </h2>
+      <PageSection
+        eyebrow="Coach Summary"
+        contentClassName="text-sm"
+      >
         <p className="mt-3 text-sm leading-relaxed text-slate-600">
           {metrics ? (
             <>
@@ -266,13 +285,14 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
               .
             </>
           ) : (
-            <>Enter your times above and compute to see your profile and zones.</>
+            <>
+              Enter your times above and compute to see your profile and zones.
+            </>
           )}
         </p>
-      </section>
+      </PageSection>
 
-      {/* Zones table */}
-      <section className="glass-card text-sm">
+      <PageSection contentClassName="text-sm">
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
           Pace Zones (min/mile, demo)
         </h2>
@@ -325,7 +345,7 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
             </tbody>
           </table>
         </div>
-      </section>
-    </section>
+      </PageSection>
+    </div>
   );
 }
