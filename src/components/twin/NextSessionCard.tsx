@@ -34,6 +34,76 @@ export function NextSessionCard({
             </span>
           </div>
           <p className="text-[0.75rem] text-slate-500">“{dtRx.rationale}”</p>
+          {dtRx.why ? (
+            <details className="details-disclosure mt-3 rounded-lg border border-slate-200/80 bg-slate-50/50 px-2 py-1.5 text-left">
+              <summary className="cursor-pointer text-[0.65rem] font-semibold text-slate-600 [&::-webkit-details-marker]:hidden">
+                Why this session?
+                <span
+                  className="details-chevron ml-2 inline-block h-1.5 w-1.5 rotate-45 border-r-2 border-b-2 border-slate-400 align-middle"
+                  aria-hidden
+                />
+              </summary>
+              <div className="mt-2 space-y-2 text-[0.65rem] leading-relaxed text-slate-600">
+                {dtRx.why.state_drivers?.length ? (
+                  <div>
+                    <span className="font-semibold text-slate-700">State: </span>
+                    {dtRx.why.state_drivers.join("; ")}
+                  </div>
+                ) : null}
+                {dtRx.why.goal_alignment ? (
+                  <div>
+                    <span className="font-semibold text-slate-700">Goal: </span>
+                    {dtRx.why.goal_alignment}
+                  </div>
+                ) : null}
+                {dtRx.why.structured_template_name || dtRx.why.template_id ? (
+                  <div>
+                    <span className="font-semibold text-slate-700">Template: </span>
+                    {dtRx.why.structured_template_name ?? dtRx.why.template_id}
+                  </div>
+                ) : null}
+                {dtRx.why.source_alignment?.length ? (
+                  <div>
+                    <span className="font-semibold text-slate-700">Sources: </span>
+                    {dtRx.why.source_alignment.join("; ")}
+                  </div>
+                ) : null}
+                {dtRx.why.constraints_applied?.length ? (
+                  <div>
+                    <span className="font-semibold text-slate-700">Constraints: </span>
+                    {dtRx.why.constraints_applied.join("; ")}
+                  </div>
+                ) : null}
+                {dtRx.why.score != null && dtRx.why.score !== undefined ? (
+                  <div>
+                    <span className="font-semibold text-slate-700">Fit score: </span>
+                    {dtRx.why.score.toFixed(2)}
+                  </div>
+                ) : null}
+                {dtRx.why.warnings?.length ? (
+                  <div className="text-amber-900">
+                    <span className="font-semibold text-slate-700">Warnings: </span>
+                    {dtRx.why.warnings.join("; ")}
+                  </div>
+                ) : null}
+                {dtRx.why.validation ? (
+                  <div
+                    className={
+                      dtRx.why.validation.passed
+                        ? "text-teal-800"
+                        : "text-amber-800"
+                    }
+                  >
+                    Validation:{" "}
+                    {dtRx.why.validation.passed ? "passed" : "issues noted"}
+                    {dtRx.why.validation.hard_violations?.length
+                      ? ` — ${dtRx.why.validation.hard_violations.join(", ")}`
+                      : ""}
+                  </div>
+                ) : null}
+              </div>
+            </details>
+          ) : null}
         </>
       ) : (
         <p className="text-[0.75rem] text-slate-500">

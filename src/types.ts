@@ -86,11 +86,31 @@ export interface UnifiedStateVector {
   skill_state: Record<string, number>;
 }
 
+export interface ValidationSummary {
+  passed: boolean;
+  failed_checks: string[];
+  hard_violations?: string[];
+}
+
+export interface PrescriptionExplanation {
+  state_drivers: string[];
+  goal_alignment: string;
+  constraints_applied: string[];
+  source_alignment: string[];
+  template_id?: string | null;
+  prescription_branch?: string | null;
+  validation?: ValidationSummary | null;
+  warnings?: string[];
+  score?: number | null;
+  structured_template_name?: string | null;
+}
+
 export interface WorkoutPrescription {
   type: string;
   focus: string;
   rationale: string;
   duration_min: number;
+  why?: PrescriptionExplanation | null;
 }
 
 export interface WorkoutLog {

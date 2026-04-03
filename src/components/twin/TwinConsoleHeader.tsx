@@ -1,3 +1,5 @@
+import { TRAINING_GOALS } from "../../trainingGoals";
+
 type TwinConsoleHeaderProps = {
   dtGoal: string;
   onGoalChange: (goal: string) => void;
@@ -28,14 +30,15 @@ export function TwinConsoleHeader({
           <label className="flex items-center gap-2 text-[0.7rem] font-semibold text-slate-600">
             Goal
             <select
-              className="select-control max-w-[10rem] py-1.5 text-[0.7rem]"
+              className="select-control min-w-[min(100%,12rem)] max-w-[min(100%,18rem)] py-1.5 text-[0.7rem]"
               value={dtGoal}
               onChange={(e) => onGoalChange(e.target.value)}
             >
-              <option value="Strength">Strength</option>
-              <option value="Hypertrophy">Hypertrophy</option>
-              <option value="Power">Power</option>
-              <option value="General">General</option>
+              {TRAINING_GOALS.map(({ value, label }) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
             </select>
           </label>
           <button
