@@ -12,69 +12,78 @@ function App() {
 
   return (
     <div className="app-shell">
-      {/* Header */}
-      <header className="border-b border-slate-200 bg-white/80 backdrop-blur">
-          <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.22em] text-slate-500">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.9)]" />
-                <span>Perf Lab · Tactical Engine</span>
-              </div>
-
-              <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900">
-                Turn a simple field test into a digital twin.
-              </h1>
-
-              <p className="text-sm text-slate-500 max-w-xl">
-                300m + 1.5 mile → VO₂, pace zones, fatigue profile, and an adaptive
-                S(t) engine prescribing your next session.
-              </p>
+      <header className="sticky top-0 z-20 -mx-4 border-b border-slate-200/60 bg-white/70 px-4 py-5 backdrop-blur-xl sm:-mx-6 sm:rounded-b-2xl sm:px-6">
+        <div className="mx-auto flex max-w-6xl flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-2 rounded-full border border-teal-200/60 bg-teal-50/80 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-teal-800">
+              <span
+                className="h-1.5 w-1.5 rounded-full bg-teal-500 shadow-[0_0_12px_rgba(20,184,166,0.85)]"
+                aria-hidden
+              />
+              <span>Perf Lab · Tactical Engine</span>
             </div>
 
-            <div className="flex w-full flex-col items-stretch gap-4 sm:w-auto sm:items-end">
-              <div className="flex flex-wrap items-center justify-between gap-2 sm:justify-end">
-                <div className="flex gap-2">
-                  <span className="pill-accent badge-dot">VO₂ Lab</span>
-                  <span className="pill-muted">Digital Twin Engine</span>
-                </div>
-                <span className="text-slate-500">API: {API_BASE}</span>
-              </div>
-              <AuthStrip />
-            </div>
+            <h1 className="max-w-2xl text-3xl font-bold leading-tight tracking-tight text-gradient-hero sm:text-4xl">
+              Turn a simple field test into a digital twin.
+            </h1>
+
+            <p className="max-w-xl text-[0.95rem] leading-relaxed text-slate-600">
+              300m + 1.5 mile → VO₂, pace zones, fatigue profile, and an adaptive
+              S(t) engine prescribing your next session.
+            </p>
           </div>
-        </header>
 
-      {/* Main dashboard grid */}
-      <main className="mt-6 app-grid">
+          <div className="flex w-full flex-col gap-4 lg:w-auto lg:min-w-[min(100%,20rem)] lg:items-end">
+            <div className="flex w-full flex-wrap items-center justify-between gap-3 lg:justify-end">
+              <div className="flex flex-wrap gap-2">
+                <span className="pill-accent badge-dot">VO₂ Lab</span>
+                <span className="pill-muted">Digital Twin</span>
+              </div>
+              <code className="max-w-full truncate rounded-lg border border-slate-200/80 bg-slate-50 px-2 py-1 text-[0.65rem] text-slate-500">
+                {API_BASE}
+              </code>
+            </div>
+            <AuthStrip />
+          </div>
+        </div>
+      </header>
+
+      <main className="app-grid">
         <HeroFlowColumn apiBase={API_BASE} />
         <DigitalTwinPanel />
       </main>
 
-      {/* Explainer at bottom */}
-      <section className="mt-6">
-        <div className="glass-card">
+      <section>
+        <div className="glass-card relative overflow-hidden border-teal-100/80">
+          <div
+            className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-teal-400/15 blur-3xl"
+            aria-hidden
+          />
           <p className="section-label">How the engine thinks</p>
-          <p className="mt-2 text-sm text-slate-400">
-            perf-lab-api maintains a unified internal state <code>S(t)</code>{" "}
-            and applies stress doses <code>D(t)</code> for every workout you
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-slate-600">
+            perf-lab-api maintains a unified internal state <code className="rounded bg-slate-100 px-1 py-0.5 text-xs text-slate-800">S(t)</code>{" "}
+            and applies stress doses <code className="rounded bg-slate-100 px-1 py-0.5 text-xs text-slate-800">D(t)</code> for every workout you
             log. Over time, it updates your systems on multiple time scales –
             fast fatigue, slower fitness, and deeper structural changes –
             instead of following a static plan.
           </p>
-          <p className="mt-2 text-xs text-slate-500">
+          <p className="mt-3 text-xs text-slate-500">
             These panels read live state, doses, and adaptive prescriptions from
             your own twin so you can see why the next session was chosen.
           </p>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="mt-8 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-        <span>perf-lab-web · {year}</span>
-        <span className="hidden text-slate-700 sm:inline">•</span>
-        <span>
-          Built by Nalakram · React + FastAPI · backed by perf-lab-api
+      <footer className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-slate-200/60 pt-8 text-xs text-slate-500">
+        <span className="font-medium text-slate-600">perf-lab-web</span>
+        <span className="hidden text-slate-300 sm:inline" aria-hidden>
+          ·
         </span>
+        <span>{year}</span>
+        <span className="hidden text-slate-300 sm:inline" aria-hidden>
+          ·
+        </span>
+        <span>Built by Nalakram · React + FastAPI · perf-lab-api</span>
       </footer>
     </div>
   );

@@ -86,39 +86,40 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
 
   return (
     <section className="space-y-4">
-        {/* inside HeroFlowColumn, before the first <section className="glass-card"> */}
-        <div className="glass-card mb-3">
-          <p className="section-label">Hero Flow</p>
-          <div className="mt-3 flex flex-col gap-3 text-xs text-slate-300">
-            <div className="flex items-center gap-3">
-              <div className="h-6 w-6 rounded-full border border-cyan-500/70 flex items-center justify-center text-[0.7rem] font-semibold text-cyan-300 bg-slate-950">
+        <div className="feature-dark mb-1">
+          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-teal-300/90">
+            Hero Flow
+          </p>
+          <div className="mt-4 flex flex-col gap-4 text-sm">
+            <div className="flex items-start gap-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-teal-400/50 bg-teal-500/15 text-xs font-bold text-teal-200">
                 1
               </div>
               <div>
-                <p className="font-semibold text-slate-100">Enter your tactical test</p>
-                <p className="text-slate-500">
+                <p className="font-semibold text-white">Enter your tactical test</p>
+                <p className="mt-0.5 text-sm text-slate-400">
                   300 m and 1.5 mile times, age, and sex.
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="h-6 w-6 rounded-full border border-slate-700 flex items-center justify-center text-[0.7rem] font-semibold text-slate-300 bg-slate-950">
+            <div className="flex items-start gap-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-600 bg-slate-800/80 text-xs font-bold text-slate-300">
                 2
               </div>
               <div>
-                <p className="font-semibold text-slate-100">See VO₂, zones, fatigue</p>
-                <p className="text-slate-500">
+                <p className="font-semibold text-white">See VO₂, zones, fatigue</p>
+                <p className="mt-0.5 text-sm text-slate-400">
                   Get your VO₂ band, 1.5-mile category, and pace zones.
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="h-6 w-6 rounded-full border border-slate-700 flex items-center justify-center text-[0.7rem] font-semibold text-slate-300 bg-slate-950">
+            <div className="flex items-start gap-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-600 bg-slate-800/80 text-xs font-bold text-slate-300">
                 3
               </div>
               <div>
-                <p className="font-semibold text-slate-100">Log sessions into S(t)</p>
-                <p className="text-slate-500">
+                <p className="font-semibold text-white">Log sessions into S(t)</p>
+                <p className="mt-0.5 text-sm text-slate-400">
                   Feed the digital twin and see how your internal state evolves.
                 </p>
               </div>
@@ -127,18 +128,22 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
         </div>
 
       {/* Inputs card */}
-      <section className="glass-card card-hover">
+      <section className="glass-card card-hover relative overflow-hidden">
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-teal-500 via-teal-400 to-indigo-400"
+          aria-hidden
+        />
         <p className="section-label">Tactical Field Test</p>
-        <h2 className="mt-2 text-sm font-semibold text-slate-50">
+        <h2 className="mt-2 text-base font-semibold text-slate-900">
           Build your profile from one 300m + 1.5 mile
         </h2>
 
         <form
           onSubmit={computeMetrics}
-          className="mt-4 grid gap-3 text-sm sm:grid-cols-4"
+          className="mt-5 grid gap-4 text-sm sm:grid-cols-4"
         >
-          <div className="flex flex-col gap-1">
-            <label className="text-[0.65rem] uppercase tracking-[0.18em] text-slate-400">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-slate-500">
               Age
             </label>
             <input
@@ -147,54 +152,48 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
               max={80}
               value={age}
               onChange={(e) => setAge(Number(e.target.value))}
-              className="rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-900
-                    focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+              className="input-control"
             />
           </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-[0.65rem] uppercase tracking-[0.18em] text-slate-400">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-slate-500">
               Sex
             </label>
             <select
               value={sex}
               onChange={(e) => setSex(e.target.value as "male" | "female")}
-              className="rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-900
-                focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+              className="select-control"
             >
               <option value="male">Male</option>
               <option value="female">Female</option>
             </select>
           </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-[0.65rem] uppercase tracking-[0.18em] text-slate-400">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-slate-500">
               300 m (mm:ss)
             </label>
             <input
               value={time300}
               onChange={(e) => setTime300(e.target.value)}
-              className="rounded-lg border border-slate-300 bg-slate-50 px-2 py-1.5 text-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+              className="input-control bg-slate-50/80"
             />
           </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-[0.65rem] uppercase tracking-[0.18em] text-slate-400">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-slate-500">
               1.5 mile (mm:ss)
             </label>
             <input
               value={time15}
               onChange={(e) => setTime15(e.target.value)}
-              className="rounded-lg border border-slate-300 bg-slate-50 px-2 py-1.5 text-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+              className="input-control bg-slate-50/80"
             />
           </div>
 
-          <div className="mt-1 flex items-center gap-3 sm:col-span-4">
-            <button
-              type="submit"
-              disabled={loading}
-              className="inline-flex items-center rounded-full bg-gradient-to-r from-cyan-500 to-cyan-400 px-3 py-1.5 text-xs font-semibold text-slate-950 shadow-lg shadow-cyan-900/40 disabled:opacity-60"
-            >
+          <div className="mt-1 flex flex-wrap items-center gap-3 sm:col-span-4">
+            <button type="submit" disabled={loading} className="btn-primary">
               {loading ? "Computing..." : "Compute"}
             </button>
             <span className="text-xs text-slate-500">
@@ -211,8 +210,9 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
       </section>
 
       {/* Snapshot metrics */}
-      <section className="grid gap-3 text-sm md:grid-cols-3">
-        <div className="glass-card">
+      <section className="grid gap-4 text-sm md:grid-cols-3">
+        <div className="glass-card relative overflow-hidden pt-6">
+          <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-teal-500 to-teal-300" aria-hidden />
           <h2 className="metric-heading mb-1 text-xs">VO₂ Max</h2>
           <p className="metric-value">
             {metrics ? metrics.vo2_max.toFixed(1) : "–"}
@@ -222,7 +222,8 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
           </p>
         </div>
 
-        <div className="glass-card">
+        <div className="glass-card relative overflow-hidden pt-6">
+          <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-indigo-500 to-violet-400" aria-hidden />
           <h2 className="metric-heading mb-1 text-xs">1.5 mile result</h2>
           <p className="metric-value">
             {metrics
@@ -234,7 +235,8 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
           </p>
         </div>
 
-        <div className="glass-card">
+        <div className="glass-card relative overflow-hidden pt-6">
+          <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-amber-500 to-orange-400" aria-hidden />
           <h2 className="metric-heading mb-1 text-xs">Fatigue profile</h2>
           <p className="metric-value">
             {metrics ? `${metrics.fatigue_percent.toFixed(1)}%` : "–"}
@@ -247,8 +249,10 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
 
       {/* Coach summary */}
       <section className="glass-card text-sm">
-        <h2 className="text-xs font-semibold">Coach Summary</h2>
-        <p className="mt-2 text-sm leading-relaxed text-slate-200">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+          Coach Summary
+        </h2>
+        <p className="mt-3 text-sm leading-relaxed text-slate-600">
           {metrics ? (
             <>
               You are a{" "}
@@ -269,52 +273,51 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
 
       {/* Zones table */}
       <section className="glass-card text-sm">
-        <h2 className="text-xs font-semibold mb-3">
+        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
           Pace Zones (min/mile, demo)
         </h2>
-        <div className="overflow-x-auto text-xs">
+        <div className="overflow-x-auto rounded-xl border border-slate-200/80 text-xs">
           <table className="min-w-full border-collapse">
-            <thead className="text-[0.7rem] uppercase tracking-[0.18em] text-slate-400">
+            <thead className="bg-slate-50/90 text-[0.7rem] uppercase tracking-[0.14em] text-slate-500">
               <tr>
-                <th className="border-b border-slate-800 py-1 pr-2 text-left">
+                <th className="border-b border-slate-200 py-2.5 pr-3 pl-3 text-left font-semibold">
                   Zone
                 </th>
-                <th className="border-b border-slate-800 py-1 px-2 text-left">
+                <th className="border-b border-slate-200 py-2.5 px-3 text-left font-semibold">
                   Slower
                 </th>
-                <th className="border-b border-slate-800 py-1 px-2 text-left">
+                <th className="border-b border-slate-200 py-2.5 px-3 text-left font-semibold">
                   Faster
                 </th>
-                <th className="border-b border-slate-800 py-1 pl-2 text-left">
+                <th className="border-b border-slate-200 py-2.5 pl-3 pr-3 text-left font-semibold">
                   Notes
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="text-slate-700">
               {metrics &&
                 metrics.zones.map((z) => (
                   <tr
                     key={z.name}
-                    className="odd:bg-slate-900/40 hover:bg-slate-800/60"
+                    className="odd:bg-slate-50/50 transition-colors hover:bg-teal-50/40"
                   >
-                    <td className="py-1 pr-2 align-top">{z.name}</td>
-                    <td className="py-1 px-2 align-top">
+                    <td className="border-b border-slate-100 py-2 pr-3 pl-3 align-top font-medium">
+                      {z.name}
+                    </td>
+                    <td className="border-b border-slate-100 py-2 px-3 align-top tabular-nums">
                       {formatMMSS(z.slow_pace_sec)}
                     </td>
-                    <td className="py-1 px-2 align-top">
+                    <td className="border-b border-slate-100 py-2 px-3 align-top tabular-nums">
                       {formatMMSS(z.fast_pace_sec)}
                     </td>
-                    <td className="py-1 pl-2 align-top text-slate-400">
+                    <td className="border-b border-slate-100 py-2 pl-3 pr-3 align-top text-slate-500">
                       {z.notes}
                     </td>
                   </tr>
                 ))}
               {!metrics && (
                 <tr>
-                  <td
-                    colSpan={4}
-                    className="py-2 text-center text-slate-500"
-                  >
+                  <td colSpan={4} className="py-6 text-center text-slate-500">
                     Zones will appear here after you compute metrics.
                   </td>
                 </tr>

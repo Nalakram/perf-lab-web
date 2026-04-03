@@ -130,9 +130,9 @@ function FatigueBar({
         <span>{label}</span>
         <span>{pct.toFixed(1)}%</span>
       </div>
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+      <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200/90 ring-1 ring-inset ring-slate-200">
         <div
-          className="h-full rounded-full bg-cyan-500 transition-all"
+          className="h-full rounded-full bg-gradient-to-r from-teal-600 to-teal-400 transition-all duration-500"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -146,7 +146,7 @@ function DosePanel({ dose }: { dose: StressDose | null }) {
   const six = d.dose_six;
 
   return (
-    <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+    <div className="mt-3 rounded-xl border border-slate-200/90 bg-gradient-to-b from-slate-50 to-white p-3.5 shadow-sm">
       <div className="mb-2 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-slate-500">
         Dose D(t) · Simulated
       </div>
@@ -346,20 +346,23 @@ export function DigitalTwinPanel() {
   return (
     <section className="space-y-4">
       {/* Main twin console */}
-      <section className="glass-card card-hover text-sm border-cyan-100">
-        {/* Header row */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <section className="glass-card card-hover relative overflow-hidden text-sm border-teal-100/80">
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-500 via-teal-500 to-teal-400"
+          aria-hidden
+        />
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="section-label">Digital Twin · Control Loop</p>
-            <h2 className="mt-1 text-sm font-semibold text-slate-900">
+            <h2 className="mt-1.5 text-base font-semibold text-slate-900">
               S(t), D(t), and your next session
             </h2>
           </div>
-          <div className="flex items-center gap-2">
-            <label className="flex items-center gap-2 text-[0.7rem] font-medium text-slate-600">
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="flex items-center gap-2 text-[0.7rem] font-semibold text-slate-600">
               Goal
               <select
-                className="rounded-md border border-slate-300 bg-white px-2 py-1 text-[0.7rem]"
+                className="select-control max-w-[10rem] py-1.5 text-[0.7rem]"
                 value={dtGoal}
                 onChange={(e) => setDtGoal(e.target.value)}
               >
@@ -373,7 +376,7 @@ export function DigitalTwinPanel() {
               type="button"
               disabled={!token}
               onClick={() => void handleDtRefreshRx()}
-              className="rounded-full border border-slate-300 px-2 py-1 text-[0.7rem] text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+              className="btn-ghost border-slate-200 py-1.5 disabled:cursor-not-allowed"
             >
               Refresh u(t)
             </button>
@@ -421,7 +424,7 @@ export function DigitalTwinPanel() {
           {/* Log form + dose */}
           <form
             onSubmit={handleDtLog}
-            className="rounded-lg border border-slate-200 bg-slate-50 p-3"
+            className="rounded-xl border border-slate-200/90 bg-gradient-to-b from-slate-50/95 to-white p-4 shadow-sm"
           >
             <h3 className="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
               Log Workout
@@ -440,7 +443,7 @@ export function DigitalTwinPanel() {
                   Modality
                 </label>
                 <select
-                  className="rounded-md border border-slate-300 bg-white px-2 py-1"
+                  className="select-control py-1.5 text-[0.75rem]"
                   value={dtLog.modality}
                   onChange={(e) =>
                     updateDtLog("modality", e.target.value as Modality)
@@ -461,7 +464,7 @@ export function DigitalTwinPanel() {
                 <input
                   type="number"
                   min={1}
-                  className="rounded-md border border-slate-300 bg-white px-2 py-1"
+                  className="input-control py-1.5 text-[0.75rem]"
                   value={dtLog.duration_minutes}
                   onChange={(e) =>
                     updateDtLog("duration_minutes", Number(e.target.value))
@@ -477,7 +480,7 @@ export function DigitalTwinPanel() {
                   type="number"
                   min={1}
                   max={10}
-                  className="rounded-md border border-slate-300 bg-white px-2 py-1"
+                  className="input-control py-1.5 text-[0.75rem]"
                   value={dtLog.session_rpe}
                   onChange={(e) =>
                     updateDtLog("session_rpe", Number(e.target.value))
@@ -493,7 +496,7 @@ export function DigitalTwinPanel() {
                   type="number"
                   min={0}
                   max={10}
-                  className="rounded-md border border-slate-300 bg-white px-2 py-1"
+                  className="input-control py-1.5 text-[0.75rem]"
                   value={dtLog.avg_rir ?? ""}
                   onChange={(e) =>
                     updateDtLog(
@@ -514,7 +517,7 @@ export function DigitalTwinPanel() {
                   type="number"
                   min={1}
                   max={10}
-                  className="rounded-md border border-slate-300 bg-white px-2 py-1"
+                  className="input-control py-1.5 text-[0.75rem]"
                   value={dtLog.sleep_quality}
                   onChange={(e) =>
                     updateDtLog("sleep_quality", Number(e.target.value))
@@ -530,7 +533,7 @@ export function DigitalTwinPanel() {
                   type="number"
                   min={1}
                   max={10}
-                  className="rounded-md border border-slate-300 bg-white px-2 py-1"
+                  className="input-control py-1.5 text-[0.75rem]"
                   value={dtLog.life_stress_inverse}
                   onChange={(e) =>
                     updateDtLog("life_stress_inverse", Number(e.target.value))
@@ -543,7 +546,7 @@ export function DigitalTwinPanel() {
                   Dominant movement pattern
                 </label>
                 <select
-                  className="rounded-md border border-slate-300 bg-white px-2 py-1"
+                  className="select-control py-1.5 text-[0.75rem]"
                   value={dtLog.dominant_movement_pattern ?? "mixed"}
                   onChange={(e) =>
                     updateDtLog("dominant_movement_pattern", e.target.value)
@@ -562,7 +565,7 @@ export function DigitalTwinPanel() {
                   Novelty (coordination tax)
                 </label>
                 <select
-                  className="rounded-md border border-slate-300 bg-white px-2 py-1"
+                  className="select-control py-1.5 text-[0.75rem]"
                   value={String(dtLog.novelty ?? 1)}
                   onChange={(e) =>
                     updateDtLog("novelty", Number(e.target.value))
@@ -585,7 +588,7 @@ export function DigitalTwinPanel() {
                 <input
                   type="number"
                   min={1}
-                  className="rounded-md border border-slate-300 bg-white px-2 py-1"
+                  className="input-control py-1.5 text-[0.75rem]"
                   value={dtLog.estimated_sets ?? ""}
                   placeholder="—"
                   onChange={(e) =>
@@ -600,18 +603,18 @@ export function DigitalTwinPanel() {
               </div>
             </div>
 
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-4 flex flex-wrap gap-2">
               <button
                 type="submit"
                 disabled={dtLoading || !token}
-                className="inline-flex items-center rounded-full bg-cyan-500 px-3 py-1.5 text-[0.75rem] font-semibold text-white shadow disabled:opacity-60"
+                className="btn-primary text-[0.75rem]"
               >
                 {dtLoading ? "Logging..." : "Log & update S(t)"}
               </button>
               <button
                 type="button"
                 onClick={handleDtSimulate}
-                className="inline-flex items-center rounded-full border border-slate-300 px-3 py-1.5 text-[0.75rem] text-slate-700 hover:bg-slate-100"
+                className="btn-secondary text-[0.75rem]"
               >
                 Simulate D(t)
               </button>
@@ -619,7 +622,7 @@ export function DigitalTwinPanel() {
                 type="button"
                 disabled={!token}
                 onClick={() => void handleDtCrash()}
-                className="inline-flex items-center rounded-full bg-rose-500 px-3 py-1.5 text-[0.75rem] font-semibold text-white shadow hover:bg-rose-600 disabled:opacity-50"
+                className="btn-danger text-[0.75rem]"
               >
                 Crash session
               </button>
@@ -631,7 +634,7 @@ export function DigitalTwinPanel() {
           {/* Recommendation + state */}
           <div className="space-y-3">
             {/* Recommendation */}
-            <div className="rounded-lg border border-slate-200 bg-white p-3">
+            <div className="rounded-xl border border-slate-200/90 bg-white/95 p-4 shadow-sm">
               <h3 className="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
                 Next Session · u(t)
               </h3>
@@ -640,7 +643,7 @@ export function DigitalTwinPanel() {
                   Sign in to load a personalized next session from the API.
                 </p>
               ) : dtRxLoading ? (
-                <div className="h-16 animate-pulse rounded-md bg-slate-100" />
+                <div className="h-16 animate-pulse rounded-xl bg-gradient-to-r from-slate-100 via-teal-50/50 to-slate-100" />
               ) : dtRx ? (
                 <>
                   <div className="mb-2 flex items-start justify-between">
@@ -652,7 +655,7 @@ export function DigitalTwinPanel() {
                         {dtRx.focus}
                       </p>
                     </div>
-                    <span className="rounded-full bg-slate-100 px-2 py-1 text-[0.7rem] text-slate-700">
+                    <span className="rounded-full border border-teal-200/60 bg-teal-50 px-2.5 py-1 text-[0.7rem] font-semibold text-teal-900">
                       {dtRx.duration_min} min
                     </span>
                   </div>
@@ -668,7 +671,7 @@ export function DigitalTwinPanel() {
             </div>
 
             {/* State */}
-            <div className="rounded-lg border border-slate-200 bg-white p-3">
+            <div className="rounded-xl border border-slate-200/90 bg-white/95 p-4 shadow-sm">
               <h3 className="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
                 State · S(t)
               </h3>
