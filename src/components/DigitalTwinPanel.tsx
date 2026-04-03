@@ -1,5 +1,6 @@
 // src/components/DigitalTwinPanel.tsx
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useAuth } from "../auth/useAuth";
 import {
   getNextSession,
   logWorkout as logDtWorkout,
@@ -26,7 +27,77 @@ const DEFAULT_DT_LOG: WorkoutLog = {
   sleep_quality: 5,
   life_stress_inverse: 5,
   avg_rir: 2,
+  dominant_movement_pattern: "mixed",
+  novelty: 1,
 };
+
+const MOVEMENT_PATTERN_OPTIONS = [
+  "mixed",
+  "squat",
+  "hinge",
+  "run",
+  "push_horizontal",
+  "push_vertical",
+  "pull_horizontal",
+  "pull_vertical",
+  "single_leg",
+  "core",
+  "jump",
+  "bike",
+  "row",
+] as const;
+
+function toApiWorkoutLog(log: WorkoutLog): WorkoutLog {
+  const base: WorkoutLog = {
+    timestamp: log.timestamp,
+    modality: log.modality,
+    duration_minutes: log.duration_minutes,
+    session_rpe: log.session_rpe,
+    sleep_quality: log.sleep_quality,
+    life_stress_inverse: log.life_stress_inverse,
+  };
+  if (log.avg_rir !== undefined) base.avg_rir = log.avg_rir;
+  if (log.distance_meters !== undefined && log.distance_meters !== 0) {
+    base.distance_meters = log.distance_meters;
+  }
+  if (log.total_volume_load !== undefined && log.total_volume_load !== 0) {
+    base.total_volume_load = log.total_volume_load;
+  }
+  base.dominant_movement_pattern =
+    log.dominant_movement_pattern && log.dominant_movement_pattern !== ""
+      ? log.dominant_movement_pattern
+      : "mixed";
+  base.novelty = log.novelty ?? 1;
+  if (log.estimated_sets !== undefined) {
+    base.estimated_sets = log.estimated_sets;
+  }
+  return base;
+}
+
+function readinessScore(s: UnifiedStateVector): string {
+  const f = s.fatigue_f;
+  const fMean =
+    (f.cns +
+      f.muscular +
+      f.metabolic +
+      f.structural +
+      f.tendon +
+      f.grip) /
+    6;
+  const t = s.tissue_t;
+  const tMax = Math.max(
+    t.shoulder,
+    t.elbow,
+    t.wrist,
+    t.lumbar,
+    t.hip,
+    t.knee,
+    t.ankle,
+    t.finger,
+  );
+  const v = 100 - 0.55 * fMean - 0.45 * tMax;
+  return Math.max(0, Math.min(100, Math.round(v))).toFixed(0);
+}
 
 function isApiError(value: unknown): value is ApiError {
   return (
@@ -72,12 +143,29 @@ function FatigueBar({
 function DosePanel({ dose }: { dose: StressDose | null }) {
   if (!dose) return null;
   const d = dose;
+  const six = d.dose_six;
 
   return (
     <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
       <div className="mb-2 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-slate-500">
         Dose D(t) · Simulated
       </div>
+      {six ? (
+        <>
+          <p className="mb-2 text-[0.65rem] leading-snug text-slate-500">
+            Six-dose factors are relative session load (model units). Legacy
+            channels below match the familiar fatigue/signal scale.
+          </p>
+          <div className="mb-3 grid grid-cols-2 gap-1 text-[0.7rem] text-slate-600">
+            <div>Vol: {six.volume.toFixed(2)}</div>
+            <div>Int: {six.intensity.toFixed(2)}</div>
+            <div>Density: {six.density.toFixed(2)}</div>
+            <div>Impact: {six.impact.toFixed(2)}</div>
+            <div>Skill: {six.skill.toFixed(2)}</div>
+            <div>Metab: {six.metabolic.toFixed(2)}</div>
+          </div>
+        </>
+      ) : null}
       <div className="grid grid-cols-2 gap-2 text-[0.75rem] text-slate-700">
         <div>Metabolic: {d.d_met_systemic.toFixed(1)}</div>
         <div>NM Peripheral: {d.d_nm_peripheral.toFixed(1)}</div>
@@ -114,6 +202,7 @@ function SkillPanel({ state }: { state: UnifiedStateVector | null }) {
 }
 
 export function DigitalTwinPanel() {
+  const { token, isAuthenticated: signedIn } = useAuth();
   const [dtGoal, setDtGoal] = useState<string>("Strength");
   const [dtLog, setDtLog] = useState<WorkoutLog>(DEFAULT_DT_LOG);
   const [dtState, setDtState] = useState<UnifiedStateVector | null>(null);
@@ -122,16 +211,33 @@ export function DigitalTwinPanel() {
   const [dtLoading, setDtLoading] = useState(false);
   const [dtRxLoading, setDtRxLoading] = useState(false);
   const [dtError, setDtError] = useState<ApiError | null>(null);
+  const prevModalityRef = useRef(dtLog.modality);
 
-  // initial recommendation + whenever goal changes
+  useEffect(() => {
+    if (
+      dtLog.modality === "Running" &&
+      prevModalityRef.current !== "Running" &&
+      dtLog.dominant_movement_pattern === "mixed"
+    ) {
+      setDtLog((prev) => ({ ...prev, dominant_movement_pattern: "run" }));
+    }
+    prevModalityRef.current = dtLog.modality;
+  }, [dtLog.modality, dtLog.dominant_movement_pattern]);
+
+  // Prescription requires JWT
   useEffect(() => {
     let cancelled = false;
 
     const loadRx = async () => {
+      if (!token) {
+        setDtRx(null);
+        setDtRxLoading(false);
+        return;
+      }
       setDtRxLoading(true);
       setDtError(null);
       try {
-        const rx = await getNextSession(dtGoal);
+        const rx = await getNextSession(dtGoal, token);
         if (!cancelled) setDtRx(rx);
       } catch (err: unknown) {
         if (!cancelled) setDtError(toApiError(err));
@@ -144,7 +250,7 @@ export function DigitalTwinPanel() {
     return () => {
       cancelled = true;
     };
-  }, [dtGoal]);
+  }, [dtGoal, token]);
 
   function updateDtLog(field: keyof WorkoutLog, value: unknown) {
     setDtLog((prev) => ({
@@ -155,17 +261,18 @@ export function DigitalTwinPanel() {
 
   async function handleDtLog(e?: React.FormEvent) {
     if (e) e.preventDefault();
+    if (!token) return;
     setDtLoading(true);
     setDtError(null);
     setDtDose(null);
 
     try {
-      const newState = await logDtWorkout({
-        ...dtLog,
-        timestamp: nowIso(),
-      });
+      const newState = await logDtWorkout(
+        toApiWorkoutLog({ ...dtLog, timestamp: nowIso() }),
+        token,
+      );
       setDtState(newState);
-      const rx = await getNextSession(dtGoal);
+      const rx = await getNextSession(dtGoal, token);
       setDtRx(rx);
     } catch (err: unknown) {
       setDtError(toApiError(err));
@@ -178,10 +285,9 @@ export function DigitalTwinPanel() {
     setDtError(null);
     setDtDose(null);
     try {
-      const dose = await simulateDose({
-        ...dtLog,
-        timestamp: nowIso(),
-      });
+      const dose = await simulateDose(
+        toApiWorkoutLog({ ...dtLog, timestamp: nowIso() }),
+      );
       setDtDose(dose);
     } catch (err: unknown) {
       setDtError(toApiError(err));
@@ -189,6 +295,7 @@ export function DigitalTwinPanel() {
   }
 
   async function handleDtCrash() {
+    if (!token) return;
     setDtLoading(true);
     setDtError(null);
     setDtDose(null);
@@ -201,12 +308,14 @@ export function DigitalTwinPanel() {
       sleep_quality: 2,
       life_stress_inverse: 2,
       avg_rir: 0,
+      dominant_movement_pattern: "mixed",
+      novelty: 1,
     };
 
     try {
-      const newState = await logDtWorkout(crash);
+      const newState = await logDtWorkout(toApiWorkoutLog(crash), token);
       setDtState(newState);
-      const rx = await getNextSession(dtGoal);
+      const rx = await getNextSession(dtGoal, token);
       setDtRx(rx);
     } catch (err: unknown) {
       setDtError(toApiError(err));
@@ -216,10 +325,11 @@ export function DigitalTwinPanel() {
   }
 
   async function handleDtRefreshRx() {
+    if (!token) return;
     setDtRxLoading(true);
     setDtError(null);
     try {
-      const rx = await getNextSession(dtGoal);
+      const rx = await getNextSession(dtGoal, token);
       setDtRx(rx);
     } catch (err: unknown) {
       setDtError(toApiError(err));
@@ -228,18 +338,9 @@ export function DigitalTwinPanel() {
     }
   }
 
-  // derived for the summary tile
   const readiness =
-    dtState != null
-      ? Math.max(
-          0,
-          100 -
-            ((dtState.f_met_systemic +
-              dtState.f_nm_peripheral +
-              dtState.f_nm_central +
-              dtState.f_struct_damage) /
-              4),
-        ).toFixed(0)
+    dtState != null && dtState.fatigue_f && dtState.tissue_t
+      ? readinessScore(dtState)
       : "—";
 
   return (
@@ -270,8 +371,9 @@ export function DigitalTwinPanel() {
             </label>
             <button
               type="button"
-              onClick={handleDtRefreshRx}
-              className="rounded-full border border-slate-300 px-2 py-1 text-[0.7rem] text-slate-700 hover:bg-slate-100"
+              disabled={!token}
+              onClick={() => void handleDtRefreshRx()}
+              className="rounded-full border border-slate-300 px-2 py-1 text-[0.7rem] text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Refresh u(t)
             </button>
@@ -283,7 +385,9 @@ export function DigitalTwinPanel() {
           <div className="glass-card-dense card-subtle">
             <p className="metric-heading">Readiness</p>
             <p className="metric-value mt-1">{readiness}</p>
-            <p className="metric-sub mt-1">0–100 from current fatigues.</p>
+            <p className="metric-sub mt-1">
+              100 − 0.55·mean(F) − 0.45·max(T); higher is better.
+            </p>
           </div>
           <div className="glass-card-dense card-subtle">
             <p className="metric-heading">Habit Strength</p>
@@ -306,7 +410,9 @@ export function DigitalTwinPanel() {
         {/* Error, if any */}
         {dtError && (
           <div className="mt-3 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-[0.75rem] text-rose-700">
-            {dtError.message}
+            {dtError.status === 401
+              ? "Session expired or not authorized — sign in again."
+              : dtError.message}
           </div>
         )}
 
@@ -320,6 +426,13 @@ export function DigitalTwinPanel() {
             <h3 className="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
               Log Workout
             </h3>
+            {!signedIn ? (
+              <p className="mb-3 text-[0.7rem] text-amber-800">
+                Sign in above to log workouts, update S(t), and load your next
+                session. <strong>Simulate D(t)</strong> still works without an
+                account.
+              </p>
+            ) : null}
 
             <div className="grid gap-3 text-[0.75rem] sm:grid-cols-2">
               <div className="flex flex-col gap-1">
@@ -424,12 +537,73 @@ export function DigitalTwinPanel() {
                   }
                 />
               </div>
+
+              <div className="flex flex-col gap-1 sm:col-span-2">
+                <label className="text-[0.65rem] font-medium text-slate-600">
+                  Dominant movement pattern
+                </label>
+                <select
+                  className="rounded-md border border-slate-300 bg-white px-2 py-1"
+                  value={dtLog.dominant_movement_pattern ?? "mixed"}
+                  onChange={(e) =>
+                    updateDtLog("dominant_movement_pattern", e.target.value)
+                  }
+                >
+                  {MOVEMENT_PATTERN_OPTIONS.map((p) => (
+                    <option key={p} value={p}>
+                      {p.replace(/_/g, " ")}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-[0.65rem] font-medium text-slate-600">
+                  Novelty (coordination tax)
+                </label>
+                <select
+                  className="rounded-md border border-slate-300 bg-white px-2 py-1"
+                  value={String(dtLog.novelty ?? 1)}
+                  onChange={(e) =>
+                    updateDtLog("novelty", Number(e.target.value))
+                  }
+                >
+                  <option value="0.8">0.8 familiar</option>
+                  <option value="1">1.0 typical</option>
+                  <option value="1.2">1.2 somewhat new</option>
+                  <option value="1.5">1.5 novel</option>
+                  <option value="2">2.0 very novel</option>
+                  <option value="2.5">2.5 high novelty</option>
+                  <option value="3">3.0 max</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-[0.65rem] font-medium text-slate-600">
+                  Est. working sets (optional)
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  className="rounded-md border border-slate-300 bg-white px-2 py-1"
+                  value={dtLog.estimated_sets ?? ""}
+                  placeholder="—"
+                  onChange={(e) =>
+                    updateDtLog(
+                      "estimated_sets",
+                      e.target.value === ""
+                        ? undefined
+                        : Number(e.target.value),
+                    )
+                  }
+                />
+              </div>
             </div>
 
             <div className="mt-3 flex flex-wrap gap-2">
               <button
                 type="submit"
-                disabled={dtLoading}
+                disabled={dtLoading || !token}
                 className="inline-flex items-center rounded-full bg-cyan-500 px-3 py-1.5 text-[0.75rem] font-semibold text-white shadow disabled:opacity-60"
               >
                 {dtLoading ? "Logging..." : "Log & update S(t)"}
@@ -443,8 +617,9 @@ export function DigitalTwinPanel() {
               </button>
               <button
                 type="button"
-                onClick={handleDtCrash}
-                className="inline-flex items-center rounded-full bg-rose-500 px-3 py-1.5 text-[0.75rem] font-semibold text-white shadow hover:bg-rose-600"
+                disabled={!token}
+                onClick={() => void handleDtCrash()}
+                className="inline-flex items-center rounded-full bg-rose-500 px-3 py-1.5 text-[0.75rem] font-semibold text-white shadow hover:bg-rose-600 disabled:opacity-50"
               >
                 Crash session
               </button>
@@ -460,7 +635,11 @@ export function DigitalTwinPanel() {
               <h3 className="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
                 Next Session · u(t)
               </h3>
-              {dtRxLoading ? (
+              {!token ? (
+                <p className="text-[0.75rem] text-slate-500">
+                  Sign in to load a personalized next session from the API.
+                </p>
+              ) : dtRxLoading ? (
                 <div className="h-16 animate-pulse rounded-md bg-slate-100" />
               ) : dtRx ? (
                 <>
@@ -508,6 +687,43 @@ export function DigitalTwinPanel() {
                         <div>Structural: {dtState.c_struct.toFixed(1)}</div>
                         <div>W&apos;: {dtState.b_met_anaerobic.toFixed(1)}</div>
                       </div>
+                      {dtState.capacity_x ? (
+                        <div className="mt-2 border-t border-slate-100 pt-2">
+                          <div className="mb-1 text-[0.6rem] font-semibold uppercase tracking-[0.14em] text-slate-400">
+                            Capacity X(t)
+                          </div>
+                          <div className="space-y-0.5 text-[0.65rem] text-slate-600">
+                            <div>
+                              Aerobic: {dtState.capacity_x.aerobic.toFixed(1)}
+                            </div>
+                            <div>
+                              Glycolytic:{" "}
+                              {dtState.capacity_x.glycolytic.toFixed(1)}
+                            </div>
+                            <div>
+                              Max strength:{" "}
+                              {dtState.capacity_x.max_strength.toFixed(1)}
+                            </div>
+                            <div>
+                              Hypertrophy:{" "}
+                              {dtState.capacity_x.hypertrophy.toFixed(1)}
+                            </div>
+                            <div>
+                              Power: {dtState.capacity_x.power.toFixed(1)}
+                            </div>
+                            <div>
+                              Skill: {dtState.capacity_x.skill.toFixed(1)}
+                            </div>
+                            <div>
+                              Mobility: {dtState.capacity_x.mobility.toFixed(1)}
+                            </div>
+                            <div>
+                              Work cap:{" "}
+                              {dtState.capacity_x.work_capacity.toFixed(1)}
+                            </div>
+                          </div>
+                        </div>
+                      ) : null}
                     </div>
                     <div>
                       <div className="mb-1 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
@@ -543,6 +759,28 @@ export function DigitalTwinPanel() {
                     label="Structural"
                     value={dtState.f_struct_damage}
                   />
+
+                  <div className="mt-3 mb-1 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                    Component fatigue F(t)
+                  </div>
+                  <FatigueBar label="CNS" value={dtState.fatigue_f.cns} />
+                  <FatigueBar label="Muscular" value={dtState.fatigue_f.muscular} />
+                  <FatigueBar label="Metabolic" value={dtState.fatigue_f.metabolic} />
+                  <FatigueBar label="Structural" value={dtState.fatigue_f.structural} />
+                  <FatigueBar label="Tendon" value={dtState.fatigue_f.tendon} />
+                  <FatigueBar label="Grip" value={dtState.fatigue_f.grip} />
+
+                  <div className="mt-3 mb-1 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                    Tissue stress T(t)
+                  </div>
+                  <FatigueBar label="Shoulder" value={dtState.tissue_t.shoulder} />
+                  <FatigueBar label="Elbow" value={dtState.tissue_t.elbow} />
+                  <FatigueBar label="Wrist" value={dtState.tissue_t.wrist} />
+                  <FatigueBar label="Lumbar" value={dtState.tissue_t.lumbar} />
+                  <FatigueBar label="Hip" value={dtState.tissue_t.hip} />
+                  <FatigueBar label="Knee" value={dtState.tissue_t.knee} />
+                  <FatigueBar label="Ankle" value={dtState.tissue_t.ankle} />
+                  <FatigueBar label="Finger" value={dtState.tissue_t.finger} />
                 </>
               ) : (
                 <p className="text-[0.75rem] text-slate-500">

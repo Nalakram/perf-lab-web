@@ -6,28 +6,83 @@ export interface ApiError {
   details?: unknown;
 }
 
+/** POST /auth/token */
+export interface TokenResponse {
+  access_token: string;
+  token_type: string;
+}
+
+/** GET /auth/me, POST /auth/register */
+export interface UserResponse {
+  id: number;
+  email: string;
+  is_active: boolean;
+}
+
 export type Modality = "Running" | "Strength" | "Hypertrophy" | "Power" | "Mixed";
+
+export interface CapacityState {
+  aerobic: number;
+  glycolytic: number;
+  max_strength: number;
+  hypertrophy: number;
+  power: number;
+  skill: number;
+  mobility: number;
+  work_capacity: number;
+}
+
+export interface FatigueState {
+  cns: number;
+  muscular: number;
+  metabolic: number;
+  structural: number;
+  tendon: number;
+  grip: number;
+}
+
+export interface TissueState {
+  shoulder: number;
+  elbow: number;
+  wrist: number;
+  lumbar: number;
+  hip: number;
+  knee: number;
+  ankle: number;
+  finger: number;
+}
+
+export interface StressDoseSix {
+  volume: number;
+  intensity: number;
+  density: number;
+  impact: number;
+  skill: number;
+  metabolic: number;
+}
 
 export interface UnifiedStateVector {
   timestamp: string;
 
-  // Capacities (Ceilings)
+  capacity_x: CapacityState;
+  fatigue_f: FatigueState;
+  tissue_t: TissueState;
+
+  // Capacities (legacy mirrors)
   c_met_aerobic: number;
   c_nm_force: number;
   c_struct: number;
   b_met_anaerobic: number;
 
-  // Fatigues (0–100)
+  // Fatigues (legacy mirrors, 0–100)
   f_met_systemic: number;
   f_nm_peripheral: number;
   f_nm_central: number;
   f_struct_damage: number;
 
-  // Signal
   s_struct_signal: number;
 
-  // Human Factors
-  habit_strength: number; // 0–1
+  habit_strength: number;
   skill_state: Record<string, number>;
 }
 
@@ -39,21 +94,25 @@ export interface WorkoutPrescription {
 }
 
 export interface WorkoutLog {
-  timestamp: string; // ISO string
+  timestamp: string;
   modality: Modality;
 
   duration_minutes: number;
-  session_rpe: number; // 1–10
+  session_rpe: number;
 
-  sleep_quality: number;      // 1–10 (1 = terrible)
-  life_stress_inverse: number; // 1–10 (1 = high stress, 10 = low stress)
+  sleep_quality: number;
+  life_stress_inverse: number;
 
   avg_rir?: number;
   distance_meters?: number;
   total_volume_load?: number;
+  dominant_movement_pattern?: string;
+  novelty?: number;
+  estimated_sets?: number;
 }
 
 export interface StressDose {
+  dose_six: StressDoseSix;
   d_met_systemic: number;
   d_nm_peripheral: number;
   d_nm_central: number;

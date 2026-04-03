@@ -77,18 +77,38 @@ The UI calls **two different shapes** of API depending on the panel:
 | UI area | HTTP usage | Which backend |
 |---------|------------|----------------|
 | **HeroFlowColumn** | `POST {VITE_API_BASE_URL}/compute-metrics` | **Legacy** `uvicorn main:app` from `perf-lab-api` (not mounted on `app.main:app`) |
-| **DigitalTwinPanel** | `GET /ping`, `GET /v1/next-session`, `POST /v1/log-workout`, `POST /v1/simulate-dose` | **Primary** `uvicorn app.main:app` |
+| **DigitalTwinPanel** | `GET /ping`; `POST /v1/simulate-dose` (open); `GET /v1/next-session`, `POST /v1/log-workout` (Bearer JWT after sign-in) | **Primary** `uvicorn app.main:app` |
 
 So for **full local functionality** you may need the **legacy** FastAPI app for the VO₂ column, and the **primary** app for `/v1` routes—or a single deployed API that exposes **both** `/compute-metrics` and the v1 paths.
 
-### JWT gap
+### Authentication (JWT)
 
-On the current `perf-lab-api` primary app:
+On the primary `perf-lab-api` app:
 
-- `POST /v1/simulate-dose` is **unauthenticated**.
-- `POST /v1/log-workout` and `GET /v1/next-session` require a **Bearer JWT**.
+- **No login:** `POST /v1/simulate-dose`, `GET /ping`
+- **Bearer JWT required:** `POST /v1/log-workout`, `GET /v1/next-session`
 
-[`src/api/perfLabClient.ts`](src/api/perfLabClient.ts) does **not** send an `Authorization` header today. Expect **401** from a correctly configured JWT-protected API for log-workout and next-session until the client adds login (e.g. `/auth/token`), token storage, and `Authorization: Bearer …` on those requests.
+The header includes **Register** / **Log in** (email + password). The access token is stored in **`sessionStorage`** (cleared when the tab closes). Implementation:
+
+- [`src/auth/AuthContext.tsx`](src/auth/AuthContext.tsx) — session state, `login` / `register` / `logout`
+- [`src/auth/tokenStorage.ts`](src/auth/tokenStorage.ts) — token persistence
+- [`src/components/AuthStrip.tsx`](src/components/AuthStrip.tsx) — header UI
+- [`src/api/perfLabClient.ts`](src/api/perfLabClient.ts) — `register`, `login`, `fetchMe`; `Authorization` on protected calls; `401` clears the session via [`src/auth/sessionBridge.ts`](src/auth/sessionBridge.ts)
+
+Auth routes (under `VITE_API_BASE_URL`, no `/v1` prefix):
+
+- `POST /auth/register` — JSON `{ "email", "password" }`
+- `POST /auth/token` — form `username` (email) + `password` (OAuth2 password flow)
+- `GET /auth/me` — Bearer token, returns user profile
+
+### Optional `WorkoutLog` fields (digital twin)
+
+Sent when set in the log form; see [`src/types.ts`](src/types.ts):
+
+- `dominant_movement_pattern` — e.g. `mixed`, `squat`, `hinge`, `run`, …
+- `novelty` — default `1`; higher = more coordination / novelty load in the dose model
+- `estimated_sets` — optional; refines volume in the dose law
+- Existing: `avg_rir`, `distance_meters`, `total_volume_load`
 
 ---
 

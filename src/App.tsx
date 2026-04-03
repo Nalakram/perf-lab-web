@@ -1,8 +1,9 @@
 ﻿// src/App.tsx
 import "./App.css";
 import "./index.css";
-import { HeroFlowColumn } from "./components/HeroFlowColumn";
+import { AuthStrip } from "./components/AuthStrip";
 import { DigitalTwinPanel } from "./components/DigitalTwinPanel";
+import { HeroFlowColumn } from "./components/HeroFlowColumn";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL as string;
 
@@ -30,12 +31,15 @@ function App() {
               </p>
             </div>
 
-            <div className="flex flex-col items-start sm:items-end gap-2 text-[0.7rem]">
-              <div className="flex gap-2">
-                <span className="pill-accent badge-dot">VO₂ Lab</span>
-                <span className="pill-muted">Digital Twin Engine</span>
+            <div className="flex w-full flex-col items-stretch gap-4 sm:w-auto sm:items-end">
+              <div className="flex flex-wrap items-center justify-between gap-2 sm:justify-end">
+                <div className="flex gap-2">
+                  <span className="pill-accent badge-dot">VO₂ Lab</span>
+                  <span className="pill-muted">Digital Twin Engine</span>
+                </div>
+                <span className="text-slate-500">API: {API_BASE}</span>
               </div>
-              <span className="text-slate-500">API: {API_BASE}</span>
+              <AuthStrip />
             </div>
           </div>
         </header>
