@@ -43,9 +43,9 @@ function App() {
 
           <div className="flex w-full flex-col gap-4 lg:w-auto lg:min-w-[min(100%,20rem)] lg:items-end">
             <div className="flex w-full flex-wrap items-center justify-end gap-3">
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2" aria-hidden>
                 <span className="pill-accent badge-dot">VO₂ Lab</span>
-                <span className="pill-muted">Digital Twin</span>
+                <span className="pill-muted">Adaptive engine</span>
               </div>
             </div>
             <AuthStrip />
@@ -54,7 +54,7 @@ function App() {
       </header>
 
       <div
-        className="glass-card-dense flex flex-col gap-1 border border-slate-200/80 p-1.5 sm:flex-row"
+        className="relative z-30 glass-card-dense flex flex-col gap-1 border border-slate-200/80 p-1.5 sm:flex-row"
         role="tablist"
         aria-label="Workspace"
       >
