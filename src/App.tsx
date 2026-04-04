@@ -20,7 +20,7 @@ function App() {
 
   return (
     <div className="app-shell">
-      <header className="sticky top-0 z-20 -mx-4 border-b border-slate-200/60 bg-white/70 px-4 py-5 backdrop-blur-xl sm:-mx-6 sm:rounded-b-2xl sm:px-6">
+      <header className="sticky top-0 z-20 -mx-4 border-b border-slate-200/60 bg-white/70 px-4 py-6 backdrop-blur-xl sm:-mx-6 sm:rounded-b-2xl sm:px-6">
         <div className="mx-auto flex max-w-6xl flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 rounded-full border border-teal-200/60 bg-teal-50/80 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-teal-800">
@@ -31,7 +31,7 @@ function App() {
               <span>Perf Lab · Tactical Engine</span>
             </div>
 
-            <h1 className="max-w-2xl text-3xl font-bold leading-tight tracking-tight text-gradient-hero sm:text-4xl">
+            <h1 className="max-w-2xl text-4xl font-bold leading-tight tracking-tight text-gradient-hero sm:text-5xl">
               Turn a simple field test into a digital twin.
             </h1>
 
@@ -54,7 +54,7 @@ function App() {
       </header>
 
       <div
-        className="relative z-30 glass-card-dense flex flex-col gap-1 border border-slate-200/80 p-1.5 sm:flex-row"
+        className="relative z-30 glass-card-dense flex flex-col gap-1 border border-slate-200/80 p-1 sm:flex-row"
         role="tablist"
         aria-label="Workspace"
       >
@@ -65,7 +65,7 @@ function App() {
           aria-selected={mainTab === "field"}
           aria-controls="main-workspace-panel"
           tabIndex={mainTab === "field" ? 0 : -1}
-          className={`tab-pill flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${
+          className={`tab-pill flex-1 rounded-xl px-5 py-2.5 text-sm font-semibold transition ${
             mainTab === "field"
               ? "tab-pill-active text-teal-950 shadow-sm"
               : "text-slate-600 hover:bg-slate-100/80"
@@ -81,7 +81,7 @@ function App() {
           aria-selected={mainTab === "twin"}
           aria-controls="main-workspace-panel"
           tabIndex={mainTab === "twin" ? 0 : -1}
-          className={`tab-pill flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${
+          className={`tab-pill flex-1 rounded-xl px-5 py-2.5 text-sm font-semibold transition ${
             mainTab === "twin"
               ? "tab-pill-active text-teal-950 shadow-sm"
               : "text-slate-600 hover:bg-slate-100/80"
@@ -108,7 +108,7 @@ function App() {
         </div>
       </main>
 
-      <footer className="flex flex-col gap-3 border-t border-slate-200/60 pt-8 text-xs text-slate-500">
+      <footer className="flex flex-col gap-3 border-t-2 border-teal-500/20 pt-8 text-xs text-slate-500">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <span className="font-medium text-slate-600">perf-lab-web</span>
           <span className="hidden text-slate-300 sm:inline" aria-hidden>

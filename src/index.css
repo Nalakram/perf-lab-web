@@ -119,22 +119,22 @@
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-teal-900/25 transition;
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-teal-600 to-teal-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-teal-900/25 transition;
     @apply hover:from-teal-500 hover:to-teal-400 hover:shadow-teal-900/30 disabled:pointer-events-none disabled:opacity-50;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm transition;
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition;
     @apply hover:border-slate-300 hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-50;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center rounded-full border border-transparent px-3 py-1.5 text-xs font-medium text-slate-600 transition;
+    @apply inline-flex items-center justify-center rounded-full border border-transparent px-3.5 py-2 text-sm font-medium text-slate-600 transition;
     @apply hover:border-slate-200 hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-50;
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center rounded-full bg-gradient-to-r from-rose-600 to-rose-500 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-rose-900/20 transition;
+    @apply inline-flex items-center justify-center rounded-full bg-gradient-to-r from-rose-600 to-rose-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-rose-900/20 transition;
     @apply hover:from-rose-500 hover:to-rose-400 disabled:pointer-events-none disabled:opacity-50;
   }
 
@@ -161,7 +161,22 @@
   }
 }
 
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @layer utilities {
+  .animate-fade-up {
+    animation: fade-up 0.3s ease-out both;
+  }
+
   .scrollbar-thin {
     scrollbar-width: thin;
     scrollbar-color: rgba(148, 163, 184, 0.85) transparent;

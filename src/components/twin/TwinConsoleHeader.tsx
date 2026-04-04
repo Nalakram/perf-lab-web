@@ -16,7 +16,7 @@ export function TwinConsoleHeader({
   return (
     <>
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-500 via-teal-500 to-teal-400"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-indigo-500 via-teal-500 to-teal-400"
         aria-hidden
       />
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -27,10 +27,10 @@ export function TwinConsoleHeader({
           </h2>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <label className="flex items-center gap-2 text-[0.7rem] font-semibold text-slate-600">
+          <label className="flex items-center gap-2 text-xs font-semibold text-slate-600">
             Goal
             <select
-              className="select-control min-w-[min(100%,12rem)] max-w-[min(100%,18rem)] py-1.5 text-[0.7rem]"
+              className="select-control min-w-[min(100%,12rem)] max-w-[min(100%,18rem)] py-1.5 text-xs"
               value={dtGoal}
               onChange={(e) => onGoalChange(e.target.value)}
             >

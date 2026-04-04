@@ -54,7 +54,7 @@ function HeroStepper() {
 
   return (
     <div className="glass-card-dense mb-1 border border-slate-200/80">
-      <p className="section-label">Hero flow</p>
+      <p className="section-label">How it works</p>
       <div className="mt-3 flex flex-col gap-4 sm:mt-4 sm:flex-row sm:gap-3">
         {steps.map((s) => (
           <div
@@ -146,7 +146,7 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
         contentClassName="card-hover relative overflow-hidden"
       >
         <div
-          className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-teal-500 via-teal-400 to-indigo-400"
+          className="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-teal-500 via-teal-400 to-indigo-400"
           aria-hidden
         />
 
@@ -206,7 +206,13 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
 
           <div className="mt-1 flex flex-wrap items-center gap-3 sm:col-span-4">
             <button type="submit" disabled={loading} className="btn-primary">
-              {loading ? "Computing..." : "Compute"}
+              {loading && (
+                <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden>
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                </svg>
+              )}
+              {loading ? "Computing…" : "Compute"}
             </button>
             <span className="text-xs text-slate-500">
               Edit values and press Enter or click Compute.
@@ -222,47 +228,47 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
       </PageSection>
 
       <PageSection variant="plain" className="grid gap-4 text-sm md:grid-cols-3">
-        <div className="glass-card relative overflow-hidden pt-6">
+        <div className={`glass-card relative overflow-hidden bg-gradient-to-b from-teal-50/40 pt-6 ${metrics ? "animate-fade-up" : ""}`}>
           <div
-            className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-teal-500 to-teal-300"
+            className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-teal-500 to-teal-300"
             aria-hidden
           />
           <h3 className="metric-heading mb-1 text-xs">VO₂ Max</h3>
           <p className="metric-value">
-            {metrics ? metrics.vo2_max.toFixed(1) : "–"}
+            {metrics ? metrics.vo2_max.toFixed(1) : <span className="text-slate-300 select-none">––</span>}
           </p>
           <p className="metric-sub">
-            Category: {metrics ? metrics.vo2_category : "–"}
+            Category: {metrics ? metrics.vo2_category : <span className="text-slate-300">–</span>}
           </p>
         </div>
 
-        <div className="glass-card relative overflow-hidden pt-6">
+        <div className={`glass-card relative overflow-hidden bg-gradient-to-b from-indigo-50/40 pt-6 ${metrics ? "animate-fade-up [animation-delay:60ms]" : ""}`}>
           <div
-            className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-indigo-500 to-violet-400"
+            className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-500 to-violet-400"
             aria-hidden
           />
           <h3 className="metric-heading mb-1 text-xs">1.5 mile result</h3>
           <p className="metric-value">
             {metrics
               ? `${formatMMSS(metrics.race_pace_sec_per_mile)} /mi`
-              : "–"}
+              : <span className="text-slate-300 select-none">––</span>}
           </p>
           <p className="metric-sub">
-            Category: {metrics ? metrics.result_category : "–"}
+            Category: {metrics ? metrics.result_category : <span className="text-slate-300">–</span>}
           </p>
         </div>
 
-        <div className="glass-card relative overflow-hidden pt-6">
+        <div className={`glass-card relative overflow-hidden bg-gradient-to-b from-amber-50/40 pt-6 ${metrics ? "animate-fade-up [animation-delay:120ms]" : ""}`}>
           <div
-            className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-amber-500 to-orange-400"
+            className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-500 to-orange-400"
             aria-hidden
           />
           <h3 className="metric-heading mb-1 text-xs">Fatigue profile</h3>
           <p className="metric-value">
-            {metrics ? `${metrics.fatigue_percent.toFixed(1)}%` : "–"}
+            {metrics ? `${metrics.fatigue_percent.toFixed(1)}%` : <span className="text-slate-300 select-none">––</span>}
           </p>
           <p className="metric-sub">
-            {metrics ? metrics.fatigue_profile : "Speed / endurance mix"}
+            {metrics ? metrics.fatigue_profile : <span className="text-slate-300">Speed / endurance mix</span>}
           </p>
         </div>
       </PageSection>
