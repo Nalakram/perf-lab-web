@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc -l /c/Users/Nalakram/Documents/GitHub/perf-lab-api/app/logic/constraint_engine/*.py)",
+      "Bash(python -m pytest tests/test_dose_engine.py tests/test_state_update_v2.py tests/test_prescriber_candidates.py tests/test_planning.py tests/test_benchmark_loop.py -x -q)",
+      "Bash(python -m pytest tests/test_dose_engine.py tests/test_state_update_v2.py tests/test_prescriber_candidates.py tests/test_planning.py tests/test_benchmark_loop.py -q)",
+      "Bash(python -m pytest -q)"
+    ]
+  }
+}

@@ -137,7 +137,7 @@ export async function getNextSession(
   if (!API_V1_BASE) {
     throw new Error("VITE_API_BASE_URL is not configured (no /v1 base)");
   }
-  const url = `${API_V1_BASE}/next-session?goal=${encodeURIComponent(goal)}`;
+  const url = `${API_V1_BASE}/prescribe/next-session?goal=${encodeURIComponent(goal)}`;
   const res = await fetch(url, { headers: { ...authHeaders(token) } });
   return handleResponse<WorkoutPrescription>(res, { sessionOn401: true });
 }
@@ -152,7 +152,7 @@ export async function logWorkout(
   if (!API_V1_BASE) {
     throw new Error("VITE_API_BASE_URL is not configured (no /v1 base)");
   }
-  const res = await fetch(`${API_V1_BASE}/log-workout`, {
+  const res = await fetch(`${API_V1_BASE}/ingest/log-workout`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -170,7 +170,7 @@ export async function simulateDose(log: WorkoutLog): Promise<StressDose> {
   if (!API_V1_BASE) {
     throw new Error("VITE_API_BASE_URL is not configured (no /v1 base)");
   }
-  const res = await fetch(`${API_V1_BASE}/simulate-dose`, {
+  const res = await fetch(`${API_V1_BASE}/ingest/simulate-dose`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(log),
