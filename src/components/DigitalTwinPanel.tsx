@@ -1,8 +1,7 @@
 // src/components/DigitalTwinPanel.tsx
-// UPGRADED: Full command-center glass layout, neon accents, better loading states, motion
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "../auth/useAuth";
 import {
   getNextSession,
@@ -43,6 +42,7 @@ const DEFAULT_DT_LOG: WorkoutLog = {
 
 export function DigitalTwinPanel() {
   const { token, isAuthenticated: signedIn } = useAuth();
+
   const [dtGoal, setDtGoal] = useState<string>("Strength");
   const [dtLog, setDtLog] = useState<WorkoutLog>(DEFAULT_DT_LOG);
   const [dtState, setDtState] = useState<UnifiedStateVector | null>(null);
@@ -51,9 +51,10 @@ export function DigitalTwinPanel() {
   const [dtLoading, setDtLoading] = useState(false);
   const [dtRxLoading, setDtRxLoading] = useState(false);
   const [dtError, setDtError] = useState<ApiError | null>(null);
+
   const prevModalityRef = useRef(dtLog.modality);
 
-  // ... (all your existing useEffect + handler logic stays 100% unchanged)
+  // ── Original logic (unchanged) ──
   useEffect(() => {
     if (
       dtLog.modality === "Running" &&
@@ -88,8 +89,6 @@ export function DigitalTwinPanel() {
     return () => { cancelled = true; };
   }, [dtGoal, token]);
 
-  // ... (updateDtLog, handleDtLog, handleDtSimulate, handleDtCrash, handleDtRefreshRx, readiness calculation stay EXACTLY the same)
-
   function updateDtLog(field: keyof WorkoutLog, value: unknown) {
     setDtLog((prev) => ({ ...prev, [field]: value }));
   }
@@ -100,8 +99,12 @@ export function DigitalTwinPanel() {
     setDtLoading(true);
     setDtError(null);
     setDtDose(null);
+
     try {
-      const newState = await logDtWorkout(toApiWorkoutLog({ ...dtLog, timestamp: nowIso() }), token);
+      const newState = await logDtWorkout(
+        toApiWorkoutLog({ ...dtLog, timestamp: nowIso() }),
+        token,
+      );
       setDtState(newState);
       const rx = await getNextSession(dtGoal, token);
       setDtRx(rx);
@@ -128,7 +131,19 @@ export function DigitalTwinPanel() {
     setDtLoading(true);
     setDtError(null);
     setDtDose(null);
-    const crash: WorkoutLog = { ...DEFAULT_DT_LOG, duration_minutes: 90, session_rpe: 10, sleep_quality: 2, life_stress_inverse: 2, avg_rir: 0 };
+
+    const crash: WorkoutLog = {
+      timestamp: nowIso(),
+      modality: "Strength",
+      duration_minutes: 90,
+      session_rpe: 10,
+      sleep_quality: 2,
+      life_stress_inverse: 2,
+      avg_rir: 0,
+      dominant_movement_pattern: "mixed",
+      novelty: 1,
+    };
+
     try {
       const newState = await logDtWorkout(toApiWorkoutLog(crash), token);
       setDtState(newState);
@@ -155,36 +170,50 @@ export function DigitalTwinPanel() {
     }
   }
 
-  const readiness = dtState != null && dtState.fatigue_f && dtState.tissue_t ? readinessScore(dtState) : "—";
+  const readiness =
+    dtState != null && dtState.fatigue_f && dtState.tissue_t
+      ? readinessScore(dtState)
+      : "—";
 
   return (
-    <div className="space-y-8">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-8"
+    >
       <Card className="border-white/10 bg-zinc-900/70 backdrop-blur-2xl overflow-hidden">
-        <TwinConsoleHeader dtGoal={dtGoal} onGoalChange={setDtGoal} onRefreshRx={handleDtRefreshRx} token={token} />
+        <TwinConsoleHeader
+          dtGoal={dtGoal}
+          onGoalChange={setDtGoal}
+          onRefreshRx={handleDtRefreshRx}
+          token={token}
+        />
 
         <TwinSummaryStrip readiness={readiness} dtState={dtState} dtRx={dtRx} />
 
         {dtError && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mx-6 mb-4 rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-300">
-            {dtError.status === 401 ? "Session expired — sign in again" : dtError.message}
-          </motion.div>
+          <div className="mx-6 mb-4 rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-300">
+            {dtError.message}
+          </div>
         )}
 
-        <CardContent className="pt-0">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <LogWorkoutForm
-              dtLog={dtLog}
-              updateDtLog={updateDtLog}
-              signedIn={signedIn}
-              token={token}
-              dtLoading={dtLoading}
-              dtDose={dtDose}
-              onSubmit={handleDtLog}
-              onSimulate={handleDtSimulate}
-              onCrash={handleDtCrash}
-            />
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-7">
+              <LogWorkoutForm
+                dtLog={dtLog}
+                updateDtLog={updateDtLog}
+                signedIn={signedIn}
+                token={token}
+                dtLoading={dtLoading}
+                dtDose={dtDose}
+                onSubmit={handleDtLog}
+                onSimulate={handleDtSimulate}
+                onCrash={handleDtCrash}
+              />
+            </div>
 
-            <div className="space-y-6">
+            <div className="lg:col-span-5 space-y-6">
               <NextSessionCard token={token} dtRxLoading={dtRxLoading} dtRx={dtRx} />
               <StateSnapshot dtState={dtState} />
             </div>
@@ -193,6 +222,6 @@ export function DigitalTwinPanel() {
       </Card>
 
       <PatternPreviewDemo />
-    </div>
+    </motion.div>
   );
 }
