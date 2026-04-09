@@ -1,20 +1,17 @@
+// src/components/twin/LogWorkoutForm.tsx
+import { motion } from "framer-motion";
 import type { Modality, StressDose, WorkoutLog } from "../../types";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { DosePanel } from "./widgets";
 
 const MOVEMENT_PATTERN_OPTIONS = [
-  "mixed",
-  "squat",
-  "hinge",
-  "run",
-  "push_horizontal",
-  "push_vertical",
-  "pull_horizontal",
-  "pull_vertical",
-  "single_leg",
-  "core",
-  "jump",
-  "bike",
-  "row",
+  "mixed", "squat", "hinge", "run", "push_horizontal", "push_vertical",
+  "pull_horizontal", "pull_vertical", "single_leg", "core", "jump", "bike", "row",
 ] as const;
 
 type LogWorkoutFormProps = {
@@ -41,222 +38,205 @@ export function LogWorkoutForm({
   onCrash,
 }: LogWorkoutFormProps) {
   return (
-    <form
-      onSubmit={onSubmit}
-      className="rounded-xl border border-slate-200/90 bg-gradient-to-b from-slate-50/95 to-white p-4 shadow-sm"
-    >
-      <h3 className="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
-        Log Workout
-      </h3>
-      {!signedIn ? (
-        <p className="mb-3 text-[0.7rem] text-amber-800">
-          Sign in to log workouts, update S(t), and load your next session.{" "}
-          <strong>Simulate D(t)</strong> still works without an account.
-        </p>
-      ) : null}
-
-      <div className="grid gap-3 text-[0.75rem] sm:grid-cols-2">
-        <div className="flex flex-col gap-1">
-          <label className="text-[0.65rem] font-medium text-slate-600">
-            Modality
-          </label>
-          <select
-            className="select-control py-1.5 text-[0.75rem]"
-            value={dtLog.modality}
-            onChange={(e) =>
-              updateDtLog("modality", e.target.value as Modality)
-            }
-          >
-            <option value="Running">Running</option>
-            <option value="Strength">Strength</option>
-            <option value="Hypertrophy">Hypertrophy</option>
-            <option value="Power">Power</option>
-            <option value="Mixed">Mixed</option>
-          </select>
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label className="text-[0.65rem] font-medium text-slate-600">
-            Duration (min)
-          </label>
-          <input
-            type="number"
-            min={1}
-            className="input-control py-1.5 text-[0.75rem]"
-            value={dtLog.duration_minutes}
-            onChange={(e) =>
-              updateDtLog("duration_minutes", Number(e.target.value))
-            }
-          />
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label className="text-[0.65rem] font-medium text-slate-600">
-            Session RPE (1–10)
-          </label>
-          <input
-            type="number"
-            min={1}
-            max={10}
-            className="input-control py-1.5 text-[0.75rem]"
-            value={dtLog.session_rpe}
-            onChange={(e) =>
-              updateDtLog("session_rpe", Number(e.target.value))
-            }
-          />
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label className="text-[0.65rem] font-medium text-slate-600">
-            Avg RIR (optional)
-          </label>
-          <input
-            type="number"
-            min={0}
-            max={10}
-            className="input-control py-1.5 text-[0.75rem]"
-            value={dtLog.avg_rir ?? ""}
-            onChange={(e) =>
-              updateDtLog(
-                "avg_rir",
-                e.target.value === "" ? undefined : Number(e.target.value),
-              )
-            }
-          />
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label className="text-[0.65rem] font-medium text-slate-600">
-            Sleep (1–10)
-          </label>
-          <input
-            type="number"
-            min={1}
-            max={10}
-            className="input-control py-1.5 text-[0.75rem]"
-            value={dtLog.sleep_quality}
-            onChange={(e) =>
-              updateDtLog("sleep_quality", Number(e.target.value))
-            }
-          />
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label className="text-[0.65rem] font-medium text-slate-600">
-            Life Stress Inverse (1–10)
-          </label>
-          <input
-            type="number"
-            min={1}
-            max={10}
-            className="input-control py-1.5 text-[0.75rem]"
-            value={dtLog.life_stress_inverse}
-            onChange={(e) =>
-              updateDtLog("life_stress_inverse", Number(e.target.value))
-            }
-          />
-        </div>
-
-        <div className="flex flex-col gap-1 sm:col-span-2">
-          <label className="text-[0.65rem] font-medium text-slate-600">
-            Dominant movement pattern
-          </label>
-          <select
-            className="select-control py-1.5 text-[0.75rem]"
-            value={dtLog.dominant_movement_pattern ?? "mixed"}
-            onChange={(e) =>
-              updateDtLog("dominant_movement_pattern", e.target.value)
-            }
-          >
-            {MOVEMENT_PATTERN_OPTIONS.map((p) => (
-              <option key={p} value={p}>
-                {p.replace(/_/g, " ")}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label className="text-[0.65rem] font-medium text-slate-600">
-            Novelty (coordination tax)
-          </label>
-          <select
-            className="select-control py-1.5 text-[0.75rem]"
-            value={String(dtLog.novelty ?? 1)}
-            onChange={(e) =>
-              updateDtLog("novelty", Number(e.target.value))
-            }
-          >
-            <option value="0.8">0.8 familiar</option>
-            <option value="1">1.0 typical</option>
-            <option value="1.2">1.2 somewhat new</option>
-            <option value="1.5">1.5 novel</option>
-            <option value="2">2.0 very novel</option>
-            <option value="2.5">2.5 high novelty</option>
-            <option value="3">3.0 max</option>
-          </select>
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label className="text-[0.65rem] font-medium text-slate-600">
-            Est. working sets (optional)
-          </label>
-          <input
-            type="number"
-            min={1}
-            className="input-control py-1.5 text-[0.75rem]"
-            value={dtLog.estimated_sets ?? ""}
-            placeholder="—"
-            onChange={(e) =>
-              updateDtLog(
-                "estimated_sets",
-                e.target.value === "" ? undefined : Number(e.target.value),
-              )
-            }
-          />
-        </div>
-      </div>
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        <button
-          type="submit"
-          disabled={dtLoading || !token}
-          className="btn-primary text-[0.75rem]"
+    <Card className="border-white/10 bg-zinc-900/70 backdrop-blur-2xl overflow-hidden">
+      <CardContent className="p-6">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="space-y-6"
         >
-          {dtLoading ? "Logging..." : "Log & update S(t)"}
-        </button>
-        <button
-          type="button"
-          onClick={onSimulate}
-          className="btn-secondary text-[0.75rem]"
-        >
-          Simulate D(t)
-        </button>
-      </div>
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold tracking-tight text-white">
+              Log Workout
+            </h3>
+            {!signedIn && (
+              <Badge variant="outline" className="text-amber-400 border-amber-400/30">
+                Demo Mode
+              </Badge>
+            )}
+          </div>
 
-      <details className="details-disclosure mt-3 rounded-xl border border-rose-200/60 bg-rose-50/30 px-3 py-2">
-        <summary className="cursor-pointer text-[0.7rem] font-semibold text-rose-900 [&::-webkit-details-marker]:hidden">
-          Danger zone
-          <span
-            className="details-chevron ml-2 inline-block h-2 w-2 rotate-45 border-r-2 border-b-2 border-rose-400 align-middle transition-transform duration-200"
-            aria-hidden
-          />
-        </summary>
-        <p className="mt-2 text-[0.65rem] leading-relaxed text-rose-800/90">
-          Logs an extreme session into your twin for testing. Use only if you
-          understand the effect on S(t).
-        </p>
-        <button
-          type="button"
-          disabled={!token || dtLoading}
-          onClick={() => void onCrash()}
-          className="btn-danger mt-2 text-[0.75rem]"
-        >
-          Crash session
-        </button>
-      </details>
+          <form onSubmit={onSubmit} className="space-y-5">
+            {/* Modality + Duration */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-zinc-400 text-xs">Modality</Label>
+                <Select value={dtLog.modality} onValueChange={(v) => updateDtLog("modality", v as Modality)}>
+                  <SelectTrigger className="bg-black/60 border-white/10">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Strength">Strength</SelectItem>
+                    <SelectItem value="Hypertrophy">Hypertrophy</SelectItem>
+                    <SelectItem value="Power">Power</SelectItem>
+                    <SelectItem value="Running">Running</SelectItem>
+                    <SelectItem value="Mixed">Mixed</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-      <DosePanel dose={dtDose} />
-    </form>
+              <div>
+                <Label className="text-zinc-400 text-xs">Duration (min)</Label>
+                <Input
+                  type="number"
+                  value={dtLog.duration_minutes}
+                  onChange={(e) => updateDtLog("duration_minutes", Number(e.target.value))}
+                  className="bg-black/60 border-white/10"
+                />
+              </div>
+            </div>
+
+            {/* RPE, RIR, Sleep, Stress */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-zinc-400 text-xs">Session RPE (1-10)</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={10}
+                  value={dtLog.session_rpe}
+                  onChange={(e) => updateDtLog("session_rpe", Number(e.target.value))}
+                  className="bg-black/60 border-white/10"
+                />
+              </div>
+              <div>
+                <Label className="text-zinc-400 text-xs">Avg RIR (optional)</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  max={10}
+                  value={dtLog.avg_rir ?? ""}
+                  onChange={(e) => updateDtLog("avg_rir", e.target.value ? Number(e.target.value) : undefined)}
+                  className="bg-black/60 border-white/10"
+                />
+              </div>
+            </div>
+
+            {/* Sleep & Life Stress */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-zinc-400 text-xs">Sleep (1-10)</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={10}
+                  value={dtLog.sleep_quality}
+                  onChange={(e) => updateDtLog("sleep_quality", Number(e.target.value))}
+                  className="bg-black/60 border-white/10"
+                />
+              </div>
+              <div>
+                <Label className="text-zinc-400 text-xs">Life Stress Inverse (1-10)</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={10}
+                  value={dtLog.life_stress_inverse}
+                  onChange={(e) => updateDtLog("life_stress_inverse", Number(e.target.value))}
+                  className="bg-black/60 border-white/10"
+                />
+              </div>
+            </div>
+
+            {/* Movement Pattern & Novelty */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-zinc-400 text-xs">Dominant Movement Pattern</Label>
+                <Select
+                  value={dtLog.dominant_movement_pattern ?? "mixed"}
+                  onValueChange={(v) => updateDtLog("dominant_movement_pattern", v)}
+                >
+                  <SelectTrigger className="bg-black/60 border-white/10">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MOVEMENT_PATTERN_OPTIONS.map((p) => (
+                      <SelectItem key={p} value={p}>
+                        {p.replace(/_/g, " ")}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-zinc-400 text-xs">Novelty (coordination tax)</Label>
+                <Select
+                  value={String(dtLog.novelty ?? 1)}
+                  onValueChange={(v) => updateDtLog("novelty", Number(v))}
+                >
+                  <SelectTrigger className="bg-black/60 border-white/10">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0.8">0.8 familiar</SelectItem>
+                    <SelectItem value="1.0">1.0 typical</SelectItem>
+                    <SelectItem value="1.2">1.2 somewhat new</SelectItem>
+                    <SelectItem value="1.5">1.5 novel</SelectItem>
+                    <SelectItem value="2.0">2.0 very novel</SelectItem>
+                    <SelectItem value="2.5">2.5 high novelty</SelectItem>
+                    <SelectItem value="3.0">3.0 max</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Estimated Sets */}
+            <div>
+              <Label className="text-zinc-400 text-xs">Est. working sets (optional)</Label>
+              <Input
+                type="number"
+                value={dtLog.estimated_sets ?? ""}
+                onChange={(e) => updateDtLog("estimated_sets", e.target.value ? Number(e.target.value) : undefined)}
+                className="bg-black/60 border-white/10"
+                placeholder="—"
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 pt-4">
+              <Button
+                type="submit"
+                disabled={dtLoading || !token}
+                className="flex-1 bg-gradient-to-r from-neon-cyan to-neon-violet text-black font-semibold"
+              >
+                {dtLoading ? "Logging..." : "Log & Update S(t)"}
+              </Button>
+
+              <Button
+                type="button"
+                onClick={onSimulate}
+                variant="outline"
+                className="flex-1 border-white/20 hover:bg-white/5"
+              >
+                Simulate D(t)
+              </Button>
+            </div>
+
+            {/* Danger Zone */}
+            <details className="mt-4 rounded-xl border border-rose-500/30 bg-rose-500/5 p-4 text-sm">
+              <summary className="cursor-pointer font-medium text-rose-400 flex items-center gap-2">
+                ⚠️ Danger Zone
+              </summary>
+              <div className="mt-3 text-xs text-rose-300">
+                Logs an extreme fatigue session for testing the twin.
+              </div>
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                onClick={onCrash}
+                disabled={!token || dtLoading}
+                className="mt-3 w-full"
+              >
+                Crash Session (extreme load)
+              </Button>
+            </details>
+          </form>
+
+          <DosePanel dose={dtDose} />
+        </motion.div>
+      </CardContent>
+    </Card>
   );
 }

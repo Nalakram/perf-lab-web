@@ -2,12 +2,14 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
+
 import { useAuth } from "../auth/useAuth";
 import {
   getNextSession,
   logWorkout as logDtWorkout,
   simulateDose,
 } from "../api/perfLabClient";
+
 import type {
   WorkoutLog,
   UnifiedStateVector,
@@ -15,18 +17,20 @@ import type {
   StressDose,
   ApiError,
 } from "../types";
+
 import { LogWorkoutForm } from "./twin/LogWorkoutForm";
 import { NextSessionCard } from "./twin/NextSessionCard";
 import { PatternPreviewDemo } from "./twin/PatternPreviewDemo";
+import { StateSnapshot } from "./twin/StateSnapshot";
+import { TwinConsoleHeader } from "./twin/TwinConsoleHeader";
+import { TwinSummaryStrip } from "./twin/TwinSummaryStrip";
+
 import {
   nowIso,
   readinessScore,
   toApiError,
   toApiWorkoutLog,
 } from "./twin/stateUtils";
-import { StateSnapshot } from "./twin/StateSnapshot";
-import { TwinConsoleHeader } from "./twin/TwinConsoleHeader";
-import { TwinSummaryStrip } from "./twin/TwinSummaryStrip";
 
 const DEFAULT_DT_LOG: WorkoutLog = {
   timestamp: nowIso(),

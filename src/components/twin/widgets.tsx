@@ -1,3 +1,5 @@
+// src/components/twin/widgets.tsx
+import { motion } from "framer-motion";
 import type { StressDose, UnifiedStateVector } from "../../types";
 
 export function FatigueBar({
@@ -11,15 +13,17 @@ export function FatigueBar({
   const pct = Math.max(0, Math.min(100, v));
 
   return (
-    <div className="mb-2">
-      <div className="mb-1 flex justify-between text-[0.7rem] text-slate-500">
-        <span>{label}</span>
-        <span>{pct.toFixed(1)}%</span>
+    <div className="mb-4">
+      <div className="mb-1.5 flex justify-between text-xs">
+        <span className="text-zinc-400">{label}</span>
+        <span className="font-mono text-neon-cyan">{pct.toFixed(1)}%</span>
       </div>
-      <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200/90 ring-1 ring-inset ring-slate-200">
-        <div
-          className="h-full rounded-full bg-gradient-to-r from-teal-600 to-teal-400 transition-all duration-500"
-          style={{ width: `${pct}%` }}
+      <div className="h-2.5 w-full overflow-hidden rounded-full bg-black/60">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="h-full bg-gradient-to-r from-neon-cyan to-neon-violet"
         />
       </div>
     </div>
@@ -28,61 +32,70 @@ export function FatigueBar({
 
 export function DosePanel({ dose }: { dose: StressDose | null }) {
   if (!dose) return null;
-  const d = dose;
-  const six = d.dose_six;
 
   return (
-    <div className="mt-3 rounded-xl border border-slate-200/90 bg-gradient-to-b from-slate-50 to-white p-3.5 shadow-sm">
-      <div className="mb-2 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-slate-500">
-        Dose D(t) · Simulated
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="mt-6 rounded-3xl border border-white/10 bg-zinc-900/70 backdrop-blur-2xl p-5"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-xs font-mono tracking-widest text-neon-magenta">SIMULATED DOSE • D(t)</span>
       </div>
-      {six ? (
-        <>
-          <p className="mb-2 text-[0.65rem] leading-snug text-slate-500">
-            Six-dose factors are relative session load (model units). Legacy
-            channels below match the familiar fatigue/signal scale.
-          </p>
-          <div className="mb-3 grid grid-cols-2 gap-1 text-[0.7rem] text-slate-600">
-            <div>Vol: {six.volume.toFixed(2)}</div>
-            <div>Int: {six.intensity.toFixed(2)}</div>
-            <div>Density: {six.density.toFixed(2)}</div>
-            <div>Impact: {six.impact.toFixed(2)}</div>
-            <div>Skill: {six.skill.toFixed(2)}</div>
-            <div>Metab: {six.metabolic.toFixed(2)}</div>
-          </div>
-        </>
-      ) : null}
-      <div className="grid grid-cols-2 gap-2 text-[0.75rem] text-slate-700">
-        <div>Metabolic: {d.d_met_systemic.toFixed(1)}</div>
-        <div>NM Peripheral: {d.d_nm_peripheral.toFixed(1)}</div>
-        <div>NM Central: {d.d_nm_central.toFixed(1)}</div>
-        <div>Struct Damage: {d.d_struct_damage.toFixed(1)}</div>
-        <div className="col-span-2">
-          Struct Signal: {d.d_struct_signal.toFixed(1)}
+
+      <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
+        <div className="flex justify-between">
+          <span className="text-zinc-400">Metabolic</span>
+          <span className="font-mono text-white">{dose.d_met_systemic.toFixed(1)}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-zinc-400">NM Peripheral</span>
+          <span className="font-mono text-white">{dose.d_nm_peripheral.toFixed(1)}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-zinc-400">NM Central</span>
+          <span className="font-mono text-white">{dose.d_nm_central.toFixed(1)}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-zinc-400">Structural Damage</span>
+          <span className="font-mono text-white">{dose.d_struct_damage.toFixed(1)}</span>
+        </div>
+        <div className="col-span-2 flex justify-between border-t border-white/10 pt-3">
+          <span className="text-zinc-400">Structural Signal</span>
+          <span className="font-mono text-neon-cyan">{dose.d_struct_signal.toFixed(1)}</span>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 export function SkillPanel({ state }: { state: UnifiedStateVector | null }) {
-  if (!state || !state.skill_state) return null;
-  const entries = Object.entries(state.skill_state);
-  if (!entries.length) return null;
+  if (!state?.skill_state || Object.keys(state.skill_state).length === 0) {
+    return null;
+  }
 
   return (
-    <div className="mt-2">
-      <div className="mb-1 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
-        Skill State
-      </div>
-      <ul className="space-y-1 text-[0.75rem] text-slate-700">
-        {entries.map(([movement, skill]) => (
-          <li key={movement} className="flex justify-between">
-            <span>{movement}</span>
-            <span>{(skill * 100).toFixed(0)}%</span>
-          </li>
+    <div className="mt-4">
+      <p className="text-xs font-mono tracking-widest text-neon-violet mb-3">SKILL STATE</p>
+      <div className="space-y-3">
+        {Object.entries(state.skill_state).map(([movement, value]) => (
+          <div key={movement} className="flex items-center justify-between">
+            <span className="text-sm text-zinc-300 capitalize">{movement.replace(/_/g, " ")}</span>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-24 bg-black/60 rounded-full overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${(value * 100)}%` }}
+                  className="h-full bg-gradient-to-r from-neon-violet to-neon-cyan"
+                />
+              </div>
+              <span className="font-mono text-xs text-white w-10 text-right">
+                {(value * 100).toFixed(0)}%
+              </span>
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
