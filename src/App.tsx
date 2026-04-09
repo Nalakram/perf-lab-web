@@ -1,7 +1,9 @@
 ﻿// src/App.tsx
+// UPGRADED: Full cyber-athletic command-center look with shadcn nova + Framer Motion + neon accents
 import { useId, useState } from "react";
-import "./App.css";
-import "./index.css";
+import { motion } from "framer-motion";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card } from "@/components/ui/card";
 import { AuthStrip } from "./components/AuthStrip";
 import { DigitalTwinPanel } from "./components/DigitalTwinPanel";
 import { EngineExplainer } from "./components/EngineExplainer";
@@ -11,133 +13,94 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL as string;
 
 type MainTab = "field" | "twin";
 
-function App() {
+export default function App() {
   const year = new Date().getFullYear();
   const [mainTab, setMainTab] = useState<MainTab>("field");
   const tabListId = useId();
-  const fieldTabId = `${tabListId}-field`;
-  const twinTabId = `${tabListId}-twin`;
 
   return (
-    <div className="app-shell">
-      <header className="sticky top-0 z-20 -mx-4 border-b border-slate-200/60 bg-white/70 px-4 py-6 backdrop-blur-xl sm:-mx-6 sm:rounded-b-2xl sm:px-6">
-        <div className="mx-auto flex max-w-6xl flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-teal-200/60 bg-teal-50/80 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-teal-800">
-              <span
-                className="h-1.5 w-1.5 rounded-full bg-teal-500 shadow-[0_0_12px_rgba(20,184,166,0.85)]"
-                aria-hidden
-              />
-              <span>Perf Lab · Tactical Engine</span>
-            </div>
+    <div className="min-h-screen bg-zinc-950 text-zinc-100">
+      {/* Neon grid background (very subtle) */}
+      <div className="fixed inset-0 bg-[radial-gradient(#00f5ff_0.8px,transparent_0.8px)] bg-[length:40px_40px] opacity-[0.03] pointer-events-none" />
 
-            <h1 className="max-w-2xl text-4xl font-bold leading-tight tracking-tight text-gradient-hero sm:text-5xl">
-              Turn a simple field test into a digital twin.
-            </h1>
-
-            <p className="max-w-xl text-[0.95rem] leading-relaxed text-slate-600">
-              300m + 1.5 mile → VO₂, pace zones, fatigue profile, and an adaptive
-              S(t) engine prescribing your next session.
-            </p>
-          </div>
-
-          <div className="flex w-full flex-col gap-4 lg:w-auto lg:min-w-[min(100%,20rem)] lg:items-end">
-            <div className="flex w-full flex-wrap items-center justify-end gap-3">
-              <div className="flex flex-wrap gap-2" aria-hidden>
-                <span className="pill-accent badge-dot">VO₂ Lab</span>
-                <span className="pill-muted">Adaptive engine</span>
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-zinc-950/80 backdrop-blur-xl">
+        <div className="mx-auto max-w-screen-2xl px-6 py-6">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6"
+          >
+            {/* Logo + headline */}
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 rounded-3xl border border-neon-cyan/30 bg-black/40 px-4 py-1.5 text-xs font-bold uppercase tracking-[1.5px] text-neon-cyan shadow-[0_0_20px_-4px] shadow-neon-cyan">
+                <div className="h-2 w-2 animate-pulse rounded-full bg-neon-cyan" />
+                PERF LAB • LIVE
               </div>
+
+              <h1 className="max-w-xl text-5xl font-semibold tracking-tighter lg:text-6xl">
+                Field test →{" "}
+                <span className="bg-gradient-to-r from-neon-cyan via-neon-magenta to-neon-violet bg-clip-text text-transparent">
+                  Digital Twin
+                </span>
+              </h1>
+
+              <p className="max-w-md text-lg text-zinc-400">
+                300 m + 1.5 mi → VO₂ • fatigue • S(t) state • adaptive prescription
+              </p>
             </div>
+
             <AuthStrip />
-          </div>
+          </motion.div>
+        </div>
+
+        {/* Premium tabs */}
+        <div className="mx-auto max-w-screen-2xl px-6">
+          <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as MainTab)}>
+            <TabsList className="grid w-full max-w-md grid-cols-2 bg-zinc-900 border border-white/10">
+              <TabsTrigger value="field" className="data-[state=active]:bg-neon-cyan data-[state=active]:text-black">
+                FIELD TEST
+              </TabsTrigger>
+              <TabsTrigger value="twin" className="data-[state=active]:bg-neon-cyan data-[state=active]:text-black">
+                DIGITAL TWIN
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
       </header>
 
-      <div
-        className="relative z-30 glass-card-dense flex flex-col gap-1 border border-slate-200/80 p-1 sm:flex-row"
-        role="tablist"
-        aria-label="Workspace"
-      >
-        <button
-          type="button"
-          role="tab"
-          id={fieldTabId}
-          aria-selected={mainTab === "field"}
-          aria-controls="main-workspace-panel"
-          tabIndex={mainTab === "field" ? 0 : -1}
-          className={`tab-pill flex-1 rounded-xl px-5 py-2.5 text-sm font-semibold transition ${
-            mainTab === "field"
-              ? "tab-pill-active text-teal-950 shadow-sm"
-              : "text-slate-600 hover:bg-slate-100/80"
-          }`}
-          onClick={() => setMainTab("field")}
-        >
-          Field test
-        </button>
-        <button
-          type="button"
-          role="tab"
-          id={twinTabId}
-          aria-selected={mainTab === "twin"}
-          aria-controls="main-workspace-panel"
-          tabIndex={mainTab === "twin" ? 0 : -1}
-          className={`tab-pill flex-1 rounded-xl px-5 py-2.5 text-sm font-semibold transition ${
-            mainTab === "twin"
-              ? "tab-pill-active text-teal-950 shadow-sm"
-              : "text-slate-600 hover:bg-slate-100/80"
-          }`}
-          onClick={() => setMainTab("twin")}
-        >
-          Digital twin
-        </button>
-      </div>
+      <main className="mx-auto max-w-screen-2xl px-6 pb-12">
+        <EngineExplainer />
 
-      <EngineExplainer />
-
-      <main>
-        <div
-          id="main-workspace-panel"
-          role="tabpanel"
-          aria-labelledby={mainTab === "field" ? fieldTabId : twinTabId}
+        <motion.div
+          key={mainTab}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="mt-8"
         >
           {mainTab === "field" ? (
             <HeroFlowColumn apiBase={API_BASE} />
           ) : (
             <DigitalTwinPanel />
           )}
-        </div>
+        </motion.div>
       </main>
 
-      <footer className="flex flex-col gap-3 border-t-2 border-teal-500/20 pt-8 text-xs text-slate-500">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <span className="font-medium text-slate-600">perf-lab-web</span>
-          <span className="hidden text-slate-300 sm:inline" aria-hidden>
-            ·
-          </span>
-          <span>{year}</span>
-          <span className="hidden text-slate-300 sm:inline" aria-hidden>
-            ·
-          </span>
-          <span>Built by Nalakram · React + FastAPI · perf-lab-api</span>
-        </div>
-        <details className="details-disclosure rounded-xl border border-slate-200/80 bg-slate-50/50 px-3 py-2">
-          <summary className="cursor-pointer font-medium text-slate-600 [&::-webkit-details-marker]:hidden">
-            API endpoint
-            <span
-              className="details-chevron ml-2 inline-block h-2 w-2 rotate-45 border-r-2 border-b-2 border-slate-400 align-middle transition-transform duration-200"
-              aria-hidden
-            />
-          </summary>
-          <code className="mt-2 block break-all rounded-lg border border-slate-200/80 bg-white px-2 py-1.5 text-[0.65rem] text-slate-600">
+      {/* Footer */}
+      <footer className="border-t border-white/10 bg-black/40 py-8 text-xs text-zinc-500">
+        <div className="mx-auto max-w-screen-2xl px-6 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-6">
+            <span className="font-medium text-zinc-400">perf-lab-web</span>
+            <span className="text-zinc-600">© {year}</span>
+            <span className="text-zinc-600">Built by Nalakram • React + FastAPI</span>
+          </div>
+
+          <div className="font-mono text-[10px] text-zinc-600">
             {API_BASE}
-          </code>
-          {import.meta.env.DEV ? (
-            <p className="mt-1 text-[0.65rem] text-teal-700">Development build</p>
-          ) : null}
-        </details>
+            {import.meta.env.DEV && <span className="ml-2 text-neon-cyan">• DEV</span>}
+          </div>
+        </div>
       </footer>
     </div>
   );
 }
-
-export default App;

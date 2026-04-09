@@ -1,6 +1,12 @@
 // src/components/HeroFlowColumn.tsx
+// UPGRADED: Premium dark glass cards, shadcn form components, Framer Motion metric reveals, neon accents
 import { useEffect, useState } from "react";
-import { PageSection } from "./PageSection";
+import { motion } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 type Zone = {
   name: string;
@@ -30,59 +36,6 @@ function formatMMSS(sec: number) {
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
-function HeroStepper() {
-  const steps = [
-    {
-      n: 1,
-      title: "Enter your tactical test",
-      body: "300 m and 1.5 mile times, age, and sex.",
-      active: true,
-    },
-    {
-      n: 2,
-      title: "See VO₂, zones, fatigue",
-      body: "VO₂ band, 1.5-mile category, pace zones.",
-      active: false,
-    },
-    {
-      n: 3,
-      title: "Log sessions into S(t)",
-      body: "Use the Digital twin tab to evolve internal state.",
-      active: false,
-    },
-  ];
-
-  return (
-    <div className="glass-card-dense mb-1 border border-slate-200/80">
-      <p className="section-label">How it works</p>
-      <div className="mt-3 flex flex-col gap-4 sm:mt-4 sm:flex-row sm:gap-3">
-        {steps.map((s) => (
-          <div
-            key={s.n}
-            className="flex min-w-0 flex-1 items-start gap-2.5 sm:flex-col sm:items-stretch sm:gap-2"
-          >
-            <div
-              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-bold ${
-                s.active
-                  ? "border-teal-300/80 bg-teal-50 text-teal-800 ring-1 ring-teal-500/15"
-                  : "border-slate-200 bg-slate-50 text-slate-600"
-              }`}
-            >
-              {s.n}
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-slate-800">{s.title}</p>
-              <p className="mt-0.5 text-[0.7rem] leading-snug text-slate-500">
-                {s.body}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
   const [age, setAge] = useState(35);
   const [sex, setSex] = useState<"male" | "female">("male");
@@ -102,256 +55,188 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
       const res = await fetch(`${apiBase}/compute-metrics`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          age,
-          sex,
-          time_300m: time300,
-          time_1p5mi: time15,
-        }),
+        body: JSON.stringify({ age, sex, time_300m: time300, time_1p5mi: time15 }),
       });
 
-      if (!res.ok) {
-        setMetrics(null);
-        setMetricsError(`API error ${res.status}`);
-        return;
-      }
-
+      if (!res.ok) throw new Error(`API error ${res.status}`);
       const data = (await res.json()) as MetricsResponse;
       setMetrics(data);
     } catch (err: unknown) {
-      const msg =
-        err instanceof Error
-          ? err.message
-          : "Failed to compute metrics. Check API and network.";
-      setMetrics(null);
-      setMetricsError(msg);
+      setMetricsError(err instanceof Error ? err.message : "Failed to compute metrics");
     } finally {
       setLoading(false);
     }
   }
 
-  // Remounting this tab triggers a fresh compute (see App tab switch).
   useEffect(() => {
     computeMetrics();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <div className="space-y-4">
-      <HeroStepper />
-
-      <PageSection
-        eyebrow="Tactical Field Test"
-        title="Build your profile from one 300m + 1.5 mile"
-        contentClassName="card-hover relative overflow-hidden"
-      >
-        <div
-          className="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-teal-500 via-teal-400 to-indigo-400"
-          aria-hidden
-        />
-
-        <form
-          onSubmit={computeMetrics}
-          className="mt-5 grid gap-4 text-sm sm:grid-cols-4"
-        >
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-slate-500">
-              Age
-            </label>
-            <input
-              type="number"
-              min={15}
-              max={80}
-              value={age}
-              onChange={(e) => setAge(Number(e.target.value))}
-              className="input-control"
-            />
+    <div className="space-y-8">
+      {/* How it works */}
+      <Card className="border-white/10 bg-zinc-900/50 backdrop-blur-xl">
+        <CardHeader>
+          <CardTitle className="text-neon-cyan text-sm font-mono tracking-widest">HOW THE ENGINE WORKS</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[1, 2, 3].map((n) => (
+              <motion.div
+                key={n}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: n * 0.1 }}
+                className="flex gap-4"
+              >
+                <div className="h-7 w-7 shrink-0 rounded-2xl bg-gradient-to-br from-neon-cyan to-neon-violet flex items-center justify-center text-xs font-bold text-black">
+                  {n}
+                </div>
+                <div>
+                  <p className="font-semibold">
+                    {n === 1 && "Enter tactical test"}
+                    {n === 2 && "Instant VO₂ + zones"}
+                    {n === 3 && "Feed into S(t) twin"}
+                  </p>
+                  <p className="text-sm text-zinc-400">
+                    {n === 1 && "300 m + 1.5 mile times"}
+                    {n === 2 && "See fatigue profile & pace zones"}
+                    {n === 3 && "Log sessions → adaptive prescription"}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
           </div>
+        </CardContent>
+      </Card>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-slate-500">
-              Sex
-            </label>
-            <select
-              value={sex}
-              onChange={(e) => setSex(e.target.value as "male" | "female")}
-              className="select-control"
-            >
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-            </select>
-          </div>
+      {/* Tactical Field Test Form */}
+      <Card className="border-white/10 bg-zinc-900/50 backdrop-blur-xl overflow-hidden">
+        <CardHeader className="border-b border-white/10">
+          <CardTitle className="flex items-center gap-3">
+            <span className="text-neon-cyan">TACTICAL FIELD TEST</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <form onSubmit={computeMetrics} className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div>
+              <label className="text-xs font-medium text-zinc-400">AGE</label>
+              <Input type="number" value={age} onChange={(e) => setAge(Number(e.target.value))} className="bg-black/60 border-white/10" />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-zinc-400">SEX</label>
+              <Select value={sex} onValueChange={(v) => setSex(v as "male" | "female")}>
+                <SelectTrigger className="bg-black/60 border-white/10">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="male">Male</SelectItem>
+                  <SelectItem value="female">Female</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-zinc-400">300 M (MM:SS)</label>
+              <Input value={time300} onChange={(e) => setTime300(e.target.value)} className="bg-black/60 border-white/10 font-mono" />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-zinc-400">1.5 MILE (MM:SS)</label>
+              <Input value={time15} onChange={(e) => setTime15(e.target.value)} className="bg-black/60 border-white/10 font-mono" />
+            </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-slate-500">
-              300 m (mm:ss)
-            </label>
-            <input
-              value={time300}
-              onChange={(e) => setTime300(e.target.value)}
-              className="input-control bg-slate-50/80"
-            />
-          </div>
+            <div className="md:col-span-4 flex items-center gap-4">
+              <Button type="submit" disabled={loading} size="lg" className="bg-gradient-to-r from-neon-cyan to-neon-violet text-black font-semibold">
+                {loading ? "COMPUTING…" : "COMPUTE METRICS"}
+              </Button>
+              <span className="text-xs text-zinc-500">Press Enter or click above</span>
+            </div>
+          </form>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-slate-500">
-              1.5 mile (mm:ss)
-            </label>
-            <input
-              value={time15}
-              onChange={(e) => setTime15(e.target.value)}
-              className="input-control bg-slate-50/80"
-            />
-          </div>
+          {metricsError && <p className="mt-4 text-rose-400 text-sm">{metricsError}</p>}
+        </CardContent>
+      </Card>
 
-          <div className="mt-1 flex flex-wrap items-center gap-3 sm:col-span-4">
-            <button type="submit" disabled={loading} className="btn-primary">
-              {loading && (
-                <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden>
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                </svg>
-              )}
-              {loading ? "Computing…" : "Compute"}
-            </button>
-            <span className="text-xs text-slate-500">
-              Edit values and press Enter or click Compute.
-            </span>
-          </div>
-        </form>
+      {/* Live Metrics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <Card className="border-white/10 bg-gradient-to-br from-zinc-900 to-black h-full">
+            <CardContent className="pt-8">
+              <div className="text-neon-cyan text-xs font-mono tracking-widest">VO₂ MAX</div>
+              <div className="text-6xl font-semibold tabular-nums mt-1 text-white">
+                {metrics ? metrics.vo2_max.toFixed(1) : "––"}
+              </div>
+              <div className="text-zinc-400 text-sm mt-2">
+                {metrics ? metrics.vo2_category : "—"}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-        {metricsError && (
-          <p className="mt-3 text-xs text-rose-600">
-            Error: {metricsError}. Check API endpoint in the footer and try again.
-          </p>
-        )}
-      </PageSection>
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <Card className="border-white/10 bg-gradient-to-br from-zinc-900 to-black h-full">
+            <CardContent className="pt-8">
+              <div className="text-neon-violet text-xs font-mono tracking-widest">1.5 MILE PACE</div>
+              <div className="text-6xl font-semibold tabular-nums mt-1 text-white">
+                {metrics ? formatMMSS(metrics.race_pace_sec_per_mile) : "––"} <span className="text-base font-normal">/mi</span>
+              </div>
+              <div className="text-zinc-400 text-sm mt-2">
+                {metrics ? metrics.result_category : "—"}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-      <PageSection variant="plain" className="grid gap-4 text-sm md:grid-cols-3">
-        <div className={`glass-card relative overflow-hidden bg-gradient-to-b from-teal-50/40 pt-6 ${metrics ? "animate-fade-up" : ""}`}>
-          <div
-            className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-teal-500 to-teal-300"
-            aria-hidden
-          />
-          <h3 className="metric-heading mb-1 text-xs">VO₂ Max</h3>
-          <p className="metric-value">
-            {metrics ? metrics.vo2_max.toFixed(1) : <span className="text-slate-300 select-none">––</span>}
-          </p>
-          <p className="metric-sub">
-            Category: {metrics ? metrics.vo2_category : <span className="text-slate-300">–</span>}
-          </p>
-        </div>
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <Card className="border-white/10 bg-gradient-to-br from-zinc-900 to-black h-full">
+            <CardContent className="pt-8">
+              <div className="text-amber-400 text-xs font-mono tracking-widest">FATIGUE PROFILE</div>
+              <div className="text-6xl font-semibold tabular-nums mt-1 text-white">
+                {metrics ? `${metrics.fatigue_percent.toFixed(0)}%` : "––"}
+              </div>
+              <div className="text-zinc-400 text-sm mt-2">
+                {metrics ? metrics.fatigue_profile : "—"}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
 
-        <div className={`glass-card relative overflow-hidden bg-gradient-to-b from-indigo-50/40 pt-6 ${metrics ? "animate-fade-up [animation-delay:60ms]" : ""}`}>
-          <div
-            className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-500 to-violet-400"
-            aria-hidden
-          />
-          <h3 className="metric-heading mb-1 text-xs">1.5 mile result</h3>
-          <p className="metric-value">
-            {metrics
-              ? `${formatMMSS(metrics.race_pace_sec_per_mile)} /mi`
-              : <span className="text-slate-300 select-none">––</span>}
-          </p>
-          <p className="metric-sub">
-            Category: {metrics ? metrics.result_category : <span className="text-slate-300">–</span>}
-          </p>
-        </div>
-
-        <div className={`glass-card relative overflow-hidden bg-gradient-to-b from-amber-50/40 pt-6 ${metrics ? "animate-fade-up [animation-delay:120ms]" : ""}`}>
-          <div
-            className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-500 to-orange-400"
-            aria-hidden
-          />
-          <h3 className="metric-heading mb-1 text-xs">Fatigue profile</h3>
-          <p className="metric-value">
-            {metrics ? `${metrics.fatigue_percent.toFixed(1)}%` : <span className="text-slate-300 select-none">––</span>}
-          </p>
-          <p className="metric-sub">
-            {metrics ? metrics.fatigue_profile : <span className="text-slate-300">Speed / endurance mix</span>}
-          </p>
-        </div>
-      </PageSection>
-
-      <PageSection
-        eyebrow="Coach Summary"
-        contentClassName="text-sm"
-      >
-        <p className="mt-3 text-sm leading-relaxed text-slate-600">
-          {metrics ? (
-            <>
-              You are a{" "}
-              <strong>{metrics.fatigue_profile.toLowerCase()}</strong> runner
-              with VO₂ max in the{" "}
-              <strong>{metrics.vo2_category}</strong> range and a current
-              1.5-mile pace of{" "}
-              <strong>
-                {formatMMSS(metrics.race_pace_sec_per_mile)} per mile
-              </strong>
-              .
-            </>
-          ) : (
-            <>
-              Enter your times above and compute to see your profile and zones.
-            </>
-          )}
-        </p>
-      </PageSection>
-
-      <PageSection contentClassName="text-sm">
-        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-          Pace Zones (min/mile, demo)
-        </h2>
-        <div className="overflow-x-auto rounded-xl border border-slate-200/80 text-xs">
-          <table className="min-w-full border-collapse">
-            <thead className="bg-slate-50/90 text-[0.7rem] uppercase tracking-[0.14em] text-slate-500">
-              <tr>
-                <th className="border-b border-slate-200 py-2.5 pr-3 pl-3 text-left font-semibold">
-                  Zone
-                </th>
-                <th className="border-b border-slate-200 py-2.5 px-3 text-left font-semibold">
-                  Slower
-                </th>
-                <th className="border-b border-slate-200 py-2.5 px-3 text-left font-semibold">
-                  Faster
-                </th>
-                <th className="border-b border-slate-200 py-2.5 pl-3 pr-3 text-left font-semibold">
-                  Notes
-                </th>
-              </tr>
-            </thead>
-            <tbody className="text-slate-700">
-              {metrics &&
-                metrics.zones.map((z) => (
-                  <tr
-                    key={z.name}
-                    className="odd:bg-slate-50/50 transition-colors hover:bg-teal-50/40"
-                  >
-                    <td className="border-b border-slate-100 py-2 pr-3 pl-3 align-top font-medium">
-                      {z.name}
-                    </td>
-                    <td className="border-b border-slate-100 py-2 px-3 align-top tabular-nums">
-                      {formatMMSS(z.slow_pace_sec)}
-                    </td>
-                    <td className="border-b border-slate-100 py-2 px-3 align-top tabular-nums">
-                      {formatMMSS(z.fast_pace_sec)}
-                    </td>
-                    <td className="border-b border-slate-100 py-2 pl-3 pr-3 align-top text-slate-500">
-                      {z.notes}
-                    </td>
-                  </tr>
-                ))}
+      {/* Pace Zones Table */}
+      <Card className="border-white/10 bg-zinc-900/50">
+        <CardHeader>
+          <CardTitle className="text-sm font-mono tracking-widest text-neon-cyan">PACE ZONES (MIN/MILE)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow className="border-white/10">
+                <TableHead>ZONE</TableHead>
+                <TableHead>SLOWER</TableHead>
+                <TableHead>FASTER</TableHead>
+                <TableHead>NOTES</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {metrics?.zones.map((z) => (
+                <TableRow key={z.name} className="border-white/10">
+                  <TableCell className="font-medium">{z.name}</TableCell>
+                  <TableCell className="font-mono">{formatMMSS(z.slow_pace_sec)}</TableCell>
+                  <TableCell className="font-mono">{formatMMSS(z.fast_pace_sec)}</TableCell>
+                  <TableCell className="text-zinc-400 text-sm">{z.notes}</TableCell>
+                </TableRow>
+              ))}
               {!metrics && (
-                <tr>
-                  <td colSpan={4} className="py-6 text-center text-slate-500">
-                    Zones will appear here after you compute metrics.
-                  </td>
-                </tr>
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center text-zinc-500 py-12">
+                    Compute your test to unlock pace zones
+                  </TableCell>
+                </TableRow>
               )}
-            </tbody>
-          </table>
-        </div>
-      </PageSection>
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }
