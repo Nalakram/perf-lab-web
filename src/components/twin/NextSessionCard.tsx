@@ -49,7 +49,7 @@ export function NextSessionCard({
               <p className="text-neon-cyan text-sm">{dtRx.focus}</p>
             </div>
 
-            <p className=”text-zinc-100 italic”>”{dtRx.rationale}”</p>
+            <p className=”text-zinc-100 italic”>&ldquo;{dtRx.rationale}&rdquo;</p>
 
             {dtRx.why && (
               <details className="rounded-2xl border border-white/10 bg-black/30 p-4 text-sm">
