@@ -15,7 +15,7 @@ export function FatigueBar({
   return (
     <div className="mb-4">
       <div className="mb-1.5 flex justify-between text-xs">
-        <span className="text-zinc-400">{label}</span>
+        <span className="text-zinc-200">{label}</span>
         <span className="font-mono text-neon-cyan">{pct.toFixed(1)}%</span>
       </div>
       <div className="h-2.5 w-full overflow-hidden rounded-full bg-black/60">
@@ -45,23 +45,23 @@ export function DosePanel({ dose }: { dose: StressDose | null }) {
 
       <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
         <div className="flex justify-between">
-          <span className="text-zinc-400">Metabolic</span>
+          <span className="text-zinc-200">Metabolic</span>
           <span className="font-mono text-white">{dose.d_met_systemic.toFixed(1)}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-zinc-400">NM Peripheral</span>
+          <span className="text-zinc-200">NM Peripheral</span>
           <span className="font-mono text-white">{dose.d_nm_peripheral.toFixed(1)}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-zinc-400">NM Central</span>
+          <span className="text-zinc-200">NM Central</span>
           <span className="font-mono text-white">{dose.d_nm_central.toFixed(1)}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-zinc-400">Structural Damage</span>
+          <span className="text-zinc-200">Structural Damage</span>
           <span className="font-mono text-white">{dose.d_struct_damage.toFixed(1)}</span>
         </div>
         <div className="col-span-2 flex justify-between border-t border-white/10 pt-3">
-          <span className="text-zinc-400">Structural Signal</span>
+          <span className="text-zinc-200">Structural Signal</span>
           <span className="font-mono text-neon-cyan">{dose.d_struct_signal.toFixed(1)}</span>
         </div>
       </div>

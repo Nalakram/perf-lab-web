@@ -60,9 +60,9 @@ export function LogWorkoutForm({
             {/* Modality + Duration */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-zinc-400 text-xs">Modality</Label>
+                <Label className="text-zinc-200 text-xs">Modality</Label>
                 <Select value={dtLog.modality} onValueChange={(v) => updateDtLog("modality", v as Modality)}>
-                  <SelectTrigger className="bg-black/60 border-white/10">
+                  <SelectTrigger className="bg-black/60 border-white/20 text-white">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -76,12 +76,12 @@ export function LogWorkoutForm({
               </div>
 
               <div>
-                <Label className="text-zinc-400 text-xs">Duration (min)</Label>
+                <Label className="text-zinc-200 text-xs">Duration (min)</Label>
                 <Input
                   type="number"
                   value={dtLog.duration_minutes}
                   onChange={(e) => updateDtLog("duration_minutes", Number(e.target.value))}
-                  className="bg-black/60 border-white/10"
+                  className="bg-black/60 border-white/20 text-white"
                 />
               </div>
             </div>
@@ -89,25 +89,25 @@ export function LogWorkoutForm({
             {/* RPE, RIR, Sleep, Stress */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-zinc-400 text-xs">Session RPE (1-10)</Label>
+                <Label className="text-zinc-200 text-xs">Session RPE (1-10)</Label>
                 <Input
                   type="number"
                   min={1}
                   max={10}
                   value={dtLog.session_rpe}
                   onChange={(e) => updateDtLog("session_rpe", Number(e.target.value))}
-                  className="bg-black/60 border-white/10"
+                  className="bg-black/60 border-white/20 text-white"
                 />
               </div>
               <div>
-                <Label className="text-zinc-400 text-xs">Avg RIR (optional)</Label>
+                <Label className="text-zinc-200 text-xs">Avg RIR (optional)</Label>
                 <Input
                   type="number"
                   min={0}
                   max={10}
                   value={dtLog.avg_rir ?? ""}
                   onChange={(e) => updateDtLog("avg_rir", e.target.value ? Number(e.target.value) : undefined)}
-                  className="bg-black/60 border-white/10"
+                  className="bg-black/60 border-white/20 text-white"
                 />
               </div>
             </div>
@@ -115,25 +115,25 @@ export function LogWorkoutForm({
             {/* Sleep & Life Stress */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-zinc-400 text-xs">Sleep (1-10)</Label>
+                <Label className="text-zinc-200 text-xs">Sleep (1-10)</Label>
                 <Input
                   type="number"
                   min={1}
                   max={10}
                   value={dtLog.sleep_quality}
                   onChange={(e) => updateDtLog("sleep_quality", Number(e.target.value))}
-                  className="bg-black/60 border-white/10"
+                  className="bg-black/60 border-white/20 text-white"
                 />
               </div>
               <div>
-                <Label className="text-zinc-400 text-xs">Life Stress Inverse (1-10)</Label>
+                <Label className="text-zinc-200 text-xs">Life Stress Inverse (1-10)</Label>
                 <Input
                   type="number"
                   min={1}
                   max={10}
                   value={dtLog.life_stress_inverse}
                   onChange={(e) => updateDtLog("life_stress_inverse", Number(e.target.value))}
-                  className="bg-black/60 border-white/10"
+                  className="bg-black/60 border-white/20 text-white"
                 />
               </div>
             </div>
@@ -141,12 +141,12 @@ export function LogWorkoutForm({
             {/* Movement Pattern & Novelty */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-zinc-400 text-xs">Dominant Movement Pattern</Label>
+                <Label className="text-zinc-200 text-xs">Dominant Movement Pattern</Label>
                 <Select
                   value={dtLog.dominant_movement_pattern ?? "mixed"}
                   onValueChange={(v) => updateDtLog("dominant_movement_pattern", v)}
                 >
-                  <SelectTrigger className="bg-black/60 border-white/10">
+                  <SelectTrigger className="bg-black/60 border-white/20 text-white">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -160,12 +160,12 @@ export function LogWorkoutForm({
               </div>
 
               <div>
-                <Label className="text-zinc-400 text-xs">Novelty (coordination tax)</Label>
+                <Label className="text-zinc-200 text-xs">Novelty (coordination tax)</Label>
                 <Select
                   value={String(dtLog.novelty ?? 1)}
                   onValueChange={(v) => updateDtLog("novelty", Number(v))}
                 >
-                  <SelectTrigger className="bg-black/60 border-white/10">
+                  <SelectTrigger className="bg-black/60 border-white/20 text-white">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

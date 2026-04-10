@@ -99,7 +99,7 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
                     {n === 2 && "Instant VO₂ + zones"}
                     {n === 3 && "Feed into S(t) twin"}
                   </p>
-                  <p className="text-sm text-zinc-400">
+                  <p className="text-sm text-zinc-300">
                     {n === 1 && "300 m + 1.5 mile times"}
                     {n === 2 && "See fatigue profile & pace zones"}
                     {n === 3 && "Log sessions → adaptive prescription"}
@@ -121,13 +121,13 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
         <CardContent className="pt-6">
           <form onSubmit={computeMetrics} className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div>
-              <label className="text-xs font-medium text-zinc-400">AGE</label>
+              <label className="text-xs font-medium text-zinc-200">AGE</label>
               <Input type="number" value={age} onChange={(e) => setAge(Number(e.target.value))} className="bg-black/60 border-white/10" />
             </div>
             <div>
-              <label className="text-xs font-medium text-zinc-400">SEX</label>
+              <label className="text-xs font-medium text-zinc-200">SEX</label>
               <Select value={sex} onValueChange={(v) => setSex(v as "male" | "female")}>
-                <SelectTrigger className="bg-black/60 border-white/10">
+                <SelectTrigger className="bg-black/60 border-white/20 text-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -137,19 +137,19 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
               </Select>
             </div>
             <div>
-              <label className="text-xs font-medium text-zinc-400">300 M (MM:SS)</label>
-              <Input value={time300} onChange={(e) => setTime300(e.target.value)} className="bg-black/60 border-white/10 font-mono" />
+              <label className="text-xs font-medium text-zinc-200">300 M (MM:SS)</label>
+              <Input value={time300} onChange={(e) => setTime300(e.target.value)} className="bg-black/60 border-white/20 text-white font-mono" />
             </div>
             <div>
-              <label className="text-xs font-medium text-zinc-400">1.5 MILE (MM:SS)</label>
-              <Input value={time15} onChange={(e) => setTime15(e.target.value)} className="bg-black/60 border-white/10 font-mono" />
+              <label className="text-xs font-medium text-zinc-200">1.5 MILE (MM:SS)</label>
+              <Input value={time15} onChange={(e) => setTime15(e.target.value)} className="bg-black/60 border-white/20 text-white font-mono" />
             </div>
 
             <div className="md:col-span-4 flex items-center gap-4">
               <Button type="submit" disabled={loading} size="lg" className="bg-gradient-to-r from-neon-cyan to-neon-violet text-black font-semibold">
                 {loading ? "COMPUTING…" : "COMPUTE METRICS"}
               </Button>
-              <span className="text-xs text-zinc-500">Press Enter or click above</span>
+              <span className="text-xs text-zinc-300">Press Enter or click above</span>
             </div>
           </form>
 
@@ -166,7 +166,7 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
               <div className="text-6xl font-semibold tabular-nums mt-1 text-white">
                 {metrics ? metrics.vo2_max.toFixed(1) : "––"}
               </div>
-              <div className="text-zinc-400 text-sm mt-2">
+              <div className="text-zinc-300 text-sm mt-2">
                 {metrics ? metrics.vo2_category : "—"}
               </div>
             </CardContent>
@@ -180,7 +180,7 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
               <div className="text-6xl font-semibold tabular-nums mt-1 text-white">
                 {metrics ? formatMMSS(metrics.race_pace_sec_per_mile) : "––"} <span className="text-base font-normal">/mi</span>
               </div>
-              <div className="text-zinc-400 text-sm mt-2">
+              <div className="text-zinc-300 text-sm mt-2">
                 {metrics ? metrics.result_category : "—"}
               </div>
             </CardContent>
@@ -194,7 +194,7 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
               <div className="text-6xl font-semibold tabular-nums mt-1 text-white">
                 {metrics ? `${metrics.fatigue_percent.toFixed(0)}%` : "––"}
               </div>
-              <div className="text-zinc-400 text-sm mt-2">
+              <div className="text-zinc-300 text-sm mt-2">
                 {metrics ? metrics.fatigue_profile : "—"}
               </div>
             </CardContent>
@@ -223,12 +223,12 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
                   <TableCell className="font-medium">{z.name}</TableCell>
                   <TableCell className="font-mono">{formatMMSS(z.slow_pace_sec)}</TableCell>
                   <TableCell className="font-mono">{formatMMSS(z.fast_pace_sec)}</TableCell>
-                  <TableCell className="text-zinc-400 text-sm">{z.notes}</TableCell>
+                  <TableCell className="text-zinc-300 text-sm">{z.notes}</TableCell>
                 </TableRow>
               ))}
               {!metrics && (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-zinc-500 py-12">
+                  <TableCell colSpan={4} className="text-center text-zinc-300 py-12">
                     Compute your test to unlock pace zones
                   </TableCell>
                 </TableRow>
