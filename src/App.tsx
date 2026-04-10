@@ -42,7 +42,7 @@ export default function App() {
                 </span>
               </h1>
 
-              <p className="max-w-md text-lg text-zinc-400">
+              <p className="max-w-md text-lg text-zinc-200">
                 300 m + 1.5 mi → VO₂ • fatigue • S(t) state • adaptive prescription
               </p>
             </div>
@@ -85,15 +85,15 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/10 bg-black/40 py-8 text-xs text-zinc-500">
+      <footer className="border-t border-white/10 bg-black/40 py-8 text-xs text-zinc-300">
         <div className="mx-auto max-w-screen-2xl px-6 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-6">
-            <span className="font-medium text-zinc-400">perf-lab-web</span>
-            <span className="text-zinc-600">© {year}</span>
-            <span className="text-zinc-600">Built by Nalakram • React + FastAPI</span>
+            <span className="font-medium text-zinc-200">perf-lab-web</span>
+            <span className="text-zinc-400">© {year}</span>
+            <span className="text-zinc-400">Built by Nalakram • React + FastAPI</span>
           </div>
 
-          <div className="font-mono text-[10px] text-zinc-600">
+          <div className="font-mono text-[10px] text-zinc-400">
             {API_BASE}
             {import.meta.env.DEV && <span className="ml-2 text-neon-cyan">• DEV</span>}
           </div>

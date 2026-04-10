@@ -207,7 +207,7 @@ export function LogWorkoutForm({
                 type="button"
                 onClick={onSimulate}
                 variant="outline"
-                className="flex-1 border-white/20 hover:bg-white/5"
+                className="flex-1 border-white/20 text-white hover:bg-white/5"
               >
                 Simulate D(t)
               </Button>

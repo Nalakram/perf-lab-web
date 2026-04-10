@@ -94,7 +94,7 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
                   {n}
                 </div>
                 <div>
-                  <p className="font-semibold">
+                  <p className="font-semibold text-white">
                     {n === 1 && "Enter tactical test"}
                     {n === 2 && "Instant VO₂ + zones"}
                     {n === 3 && "Feed into S(t) twin"}
@@ -211,18 +211,18 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
           <Table>
             <TableHeader>
               <TableRow className="border-white/10">
-                <TableHead>ZONE</TableHead>
-                <TableHead>SLOWER</TableHead>
-                <TableHead>FASTER</TableHead>
-                <TableHead>NOTES</TableHead>
+                <TableHead className="text-zinc-200">ZONE</TableHead>
+                <TableHead className="text-zinc-200">SLOWER</TableHead>
+                <TableHead className="text-zinc-200">FASTER</TableHead>
+                <TableHead className="text-zinc-200">NOTES</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {metrics?.zones.map((z) => (
                 <TableRow key={z.name} className="border-white/10">
-                  <TableCell className="font-medium">{z.name}</TableCell>
-                  <TableCell className="font-mono">{formatMMSS(z.slow_pace_sec)}</TableCell>
-                  <TableCell className="font-mono">{formatMMSS(z.fast_pace_sec)}</TableCell>
+                  <TableCell className="font-medium text-white">{z.name}</TableCell>
+                  <TableCell className="font-mono text-white">{formatMMSS(z.slow_pace_sec)}</TableCell>
+                  <TableCell className="font-mono text-white">{formatMMSS(z.fast_pace_sec)}</TableCell>
                   <TableCell className="text-zinc-100 text-sm">{z.notes}</TableCell>
                 </TableRow>
               ))}
