@@ -4,7 +4,6 @@ import type { WorkoutPrescription } from "../../types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-
 type NextSessionCardProps = {
   token: string | null;
   dtRxLoading: boolean;
@@ -21,7 +20,7 @@ export function NextSessionCard({
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold tracking-tight text-white">
-            Next Session • u(t)
+            Next Session &bull; u(t)
           </CardTitle>
           {dtRx && (
             <Badge className="bg-neon-cyan text-black font-medium">
@@ -49,7 +48,7 @@ export function NextSessionCard({
               <p className="text-neon-cyan text-sm">{dtRx.focus}</p>
             </div>
 
-            <p className=”text-zinc-100 italic”>&ldquo;{dtRx.rationale}&rdquo;</p>
+            <p className="text-zinc-100 italic">{`"${dtRx.rationale}"`}</p>
 
             {dtRx.why && (
               <details className="rounded-2xl border border-white/10 bg-black/30 p-4 text-sm">
@@ -71,7 +70,7 @@ export function NextSessionCard({
                   )}
                   {dtRx.why.warnings && dtRx.why.warnings.length > 0 && (
                     <div className="text-amber-400">
-                      ⚠️ {dtRx.why.warnings.join(", ")}
+                      &#9888; {dtRx.why.warnings.join(", ")}
                     </div>
                   )}
                 </div>
