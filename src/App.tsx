@@ -1,9 +1,8 @@
 ﻿// src/App.tsx
 // UPGRADED: Full cyber-athletic command-center look with shadcn nova + Framer Motion + neon accents
-import { useId, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
 import { AuthStrip } from "./components/AuthStrip";
 import { DigitalTwinPanel } from "./components/DigitalTwinPanel";
 import { EngineExplainer } from "./components/EngineExplainer";
@@ -16,7 +15,6 @@ type MainTab = "field" | "twin";
 export default function App() {
   const year = new Date().getFullYear();
   const [mainTab, setMainTab] = useState<MainTab>("field");
-  const tabListId = useId();
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">

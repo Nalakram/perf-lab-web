@@ -8,13 +8,6 @@ type StateSnapshotProps = {
   dtState: UnifiedStateVector | null;
 };
 
-function detailsClass() {
-  return "mt-3 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 transition-all hover:border-neon-cyan/30";
-}
-
-function summaryClass() {
-  return "cursor-pointer flex items-center justify-between text-sm font-medium text-zinc-300 [&::-webkit-details-marker]:hidden group";
-}
 
 export function StateSnapshot({ dtState }: StateSnapshotProps) {
   return (
