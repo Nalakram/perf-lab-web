@@ -183,12 +183,12 @@ export function LogWorkoutForm({
 
             {/* Estimated Sets */}
             <div>
-              <Label className="text-zinc-400 text-xs">Est. working sets (optional)</Label>
+              <Label className="text-zinc-200 text-xs">Est. working sets (optional)</Label>
               <Input
                 type="number"
                 value={dtLog.estimated_sets ?? ""}
                 onChange={(e) => updateDtLog("estimated_sets", e.target.value ? Number(e.target.value) : undefined)}
-                className="bg-black/60 border-white/10"
+                className="bg-black/60 border-white/20 text-white"
                 placeholder="—"
               />
             </div>

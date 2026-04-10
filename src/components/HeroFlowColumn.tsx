@@ -99,7 +99,7 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
                     {n === 2 && "Instant VO₂ + zones"}
                     {n === 3 && "Feed into S(t) twin"}
                   </p>
-                  <p className="text-sm text-zinc-300">
+                  <p className="text-sm text-zinc-100">
                     {n === 1 && "300 m + 1.5 mile times"}
                     {n === 2 && "See fatigue profile & pace zones"}
                     {n === 3 && "Log sessions → adaptive prescription"}
@@ -122,7 +122,7 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
           <form onSubmit={computeMetrics} className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div>
               <label className="text-xs font-medium text-zinc-200">AGE</label>
-              <Input type="number" value={age} onChange={(e) => setAge(Number(e.target.value))} className="bg-black/60 border-white/10" />
+              <Input type="number" value={age} onChange={(e) => setAge(Number(e.target.value))} className="bg-black/60 border-white/20 text-white" />
             </div>
             <div>
               <label className="text-xs font-medium text-zinc-200">SEX</label>
@@ -149,7 +149,7 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
               <Button type="submit" disabled={loading} size="lg" className="bg-gradient-to-r from-neon-cyan to-neon-violet text-black font-semibold">
                 {loading ? "COMPUTING…" : "COMPUTE METRICS"}
               </Button>
-              <span className="text-xs text-zinc-300">Press Enter or click above</span>
+              <span className="text-xs text-zinc-100">Press Enter or click above</span>
             </div>
           </form>
 
@@ -166,7 +166,7 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
               <div className="text-6xl font-semibold tabular-nums mt-1 text-white">
                 {metrics ? metrics.vo2_max.toFixed(1) : "––"}
               </div>
-              <div className="text-zinc-300 text-sm mt-2">
+              <div className="text-zinc-100 text-sm mt-2">
                 {metrics ? metrics.vo2_category : "—"}
               </div>
             </CardContent>
@@ -180,7 +180,7 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
               <div className="text-6xl font-semibold tabular-nums mt-1 text-white">
                 {metrics ? formatMMSS(metrics.race_pace_sec_per_mile) : "––"} <span className="text-base font-normal">/mi</span>
               </div>
-              <div className="text-zinc-300 text-sm mt-2">
+              <div className="text-zinc-100 text-sm mt-2">
                 {metrics ? metrics.result_category : "—"}
               </div>
             </CardContent>
@@ -194,7 +194,7 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
               <div className="text-6xl font-semibold tabular-nums mt-1 text-white">
                 {metrics ? `${metrics.fatigue_percent.toFixed(0)}%` : "––"}
               </div>
-              <div className="text-zinc-300 text-sm mt-2">
+              <div className="text-zinc-100 text-sm mt-2">
                 {metrics ? metrics.fatigue_profile : "—"}
               </div>
             </CardContent>
@@ -223,12 +223,12 @@ export function HeroFlowColumn({ apiBase }: HeroFlowColumnProps) {
                   <TableCell className="font-medium">{z.name}</TableCell>
                   <TableCell className="font-mono">{formatMMSS(z.slow_pace_sec)}</TableCell>
                   <TableCell className="font-mono">{formatMMSS(z.fast_pace_sec)}</TableCell>
-                  <TableCell className="text-zinc-300 text-sm">{z.notes}</TableCell>
+                  <TableCell className="text-zinc-100 text-sm">{z.notes}</TableCell>
                 </TableRow>
               ))}
               {!metrics && (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-zinc-300 py-12">
+                  <TableCell colSpan={4} className="text-center text-zinc-100 py-12">
                     Compute your test to unlock pace zones
                   </TableCell>
                 </TableRow>

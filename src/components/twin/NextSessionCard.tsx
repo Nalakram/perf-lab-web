@@ -32,7 +32,7 @@ export function NextSessionCard({
 
       <CardContent className="space-y-6">
         {!token ? (
-          <div className="text-center py-8 text-zinc-300">
+          <div className="text-center py-8 text-zinc-100">
             Sign in to load your personalized next session
           </div>
         ) : dtRxLoading ? (
@@ -55,7 +55,7 @@ export function NextSessionCard({
                 <summary className="cursor-pointer text-zinc-200 font-medium flex items-center gap-2">
                   Why this session?
                 </summary>
-                <div className="mt-4 text-xs leading-relaxed text-zinc-300 space-y-3">
+                <div className="mt-4 text-xs leading-relaxed text-zinc-100 space-y-3">
                   {dtRx.why.state_drivers && (
                     <div>
                       <span className="text-neon-violet">State drivers:</span>{" "}
@@ -78,7 +78,7 @@ export function NextSessionCard({
             )}
           </motion.div>
         ) : (
-          <div className="text-center py-8 text-zinc-300">
+          <div className="text-center py-8 text-zinc-100">
             Log one workout to generate your first prescription
           </div>
         )}

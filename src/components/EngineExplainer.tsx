@@ -15,7 +15,7 @@ export function EngineExplainer() {
           &mdash; fast fatigue, slower fitness, and deeper structural changes &mdash; instead of
           following a static plan.
         </p>
-        <p className="text-zinc-400 text-xs">
+        <p className="text-zinc-300 text-xs">
           These panels read live state, doses, and adaptive prescriptions from your own twin
           so you can see why the next session was chosen.
         </p>

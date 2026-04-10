@@ -19,7 +19,7 @@ export function TwinSummaryStrip({
         <CardContent className="p-4 text-center">
           <p className="text-xs font-mono tracking-widest text-neon-cyan">READINESS</p>
           <p className="text-4xl font-semibold text-white mt-1">{readiness}</p>
-          <p className="text-xs text-zinc-300 mt-2">Higher is better</p>
+          <p className="text-xs text-zinc-100 mt-2">Higher is better</p>
         </CardContent>
       </Card>
 
@@ -29,7 +29,7 @@ export function TwinSummaryStrip({
           <p className="text-4xl font-semibold text-white mt-1">
             {dtState ? `${(dtState.habit_strength * 100).toFixed(0)}%` : "—"}
           </p>
-          <p className="text-xs text-zinc-300 mt-2">Automatic training</p>
+          <p className="text-xs text-zinc-100 mt-2">Automatic training</p>
         </CardContent>
       </Card>
 
@@ -39,7 +39,7 @@ export function TwinSummaryStrip({
           <p className="text-4xl font-semibold text-white mt-1">
             {dtRx ? `${dtRx.duration_min} min` : "—"}
           </p>
-          <p className="text-xs text-zinc-300 mt-2">{dtRx ? dtRx.type : "Waiting for first log"}</p>
+          <p className="text-xs text-zinc-100 mt-2">{dtRx ? dtRx.type : "Waiting for first log"}</p>
         </CardContent>
       </Card>
     </div>

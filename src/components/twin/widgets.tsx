@@ -80,7 +80,7 @@ export function SkillPanel({ state }: { state: UnifiedStateVector | null }) {
       <div className="space-y-3">
         {Object.entries(state.skill_state).map(([movement, value]) => (
           <div key={movement} className="flex items-center justify-between">
-            <span className="text-sm text-zinc-300 capitalize">{movement.replace(/_/g, " ")}</span>
+            <span className="text-sm text-zinc-100 capitalize">{movement.replace(/_/g, " ")}</span>
             <div className="flex items-center gap-2">
               <div className="h-2 w-24 bg-black/60 rounded-full overflow-hidden">
                 <motion.div
