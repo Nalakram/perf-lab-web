@@ -102,7 +102,6 @@ export function DigitalTwinPanel() {
     setDtLoading(true);
     setDtError(null);
     setDtDose(null);
-
     try {
       const newState = await logDtWorkout(
         toApiWorkoutLog({ ...dtLog, timestamp: nowIso() }),
@@ -134,7 +133,6 @@ export function DigitalTwinPanel() {
     setDtLoading(true);
     setDtError(null);
     setDtDose(null);
-
     const crash: WorkoutLog = {
       timestamp: nowIso(),
       modality: "Strength",
@@ -146,7 +144,6 @@ export function DigitalTwinPanel() {
       dominant_movement_pattern: "mixed",
       novelty: 1,
     };
-
     try {
       const newState = await logDtWorkout(toApiWorkoutLog(crash), token);
       setDtState(newState);
@@ -179,52 +176,57 @@ export function DigitalTwinPanel() {
       : "—";
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-8"
-    >
-      <Card className="border-white/10 bg-zinc-900/70 backdrop-blur-2xl overflow-hidden">
-        <TwinConsoleHeader
-          dtGoal={dtGoal}
-          onGoalChange={setDtGoal}
-          onRefreshRx={handleDtRefreshRx}
-          token={token}
-        />
+    <div className="relative min-h-[calc(100vh-200px)] bg-black">
+      {/* Cyberpunk scanline background */}
+      <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,#00f5ff10_0px,#00f5ff10_1px,transparent_1px,transparent_4px)] pointer-events-none opacity-30" />
 
-        <TwinSummaryStrip readiness={readiness} dtState={dtState} dtRx={dtRx} />
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="relative z-10 space-y-8 p-6"
+      >
+        <Card className="border border-neon-cyan/40 bg-zinc-950/90 backdrop-blur-3xl shadow-2xl shadow-neon-cyan/20 overflow-hidden">
+          <TwinConsoleHeader
+            dtGoal={dtGoal}
+            onGoalChange={setDtGoal}
+            onRefreshRx={handleDtRefreshRx}
+            token={token}
+          />
 
-        {dtError && (
-          <div className="mx-6 mb-4 rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-300">
-            {dtError.message}
-          </div>
-        )}
+          <TwinSummaryStrip readiness={readiness} dtState={dtState} dtRx={dtRx} />
 
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div className="lg:col-span-7">
-              <LogWorkoutForm
-                dtLog={dtLog}
-                updateDtLog={updateDtLog}
-                signedIn={signedIn}
-                token={token}
-                dtLoading={dtLoading}
-                dtDose={dtDose}
-                onSubmit={handleDtLog}
-                onSimulate={handleDtSimulate}
-                onCrash={handleDtCrash}
-              />
+          {dtError && (
+            <div className="mx-6 mb-4 rounded-2xl border border-rose-400/60 bg-rose-950/60 p-4 text-sm text-rose-200 font-mono font-medium">
+              {dtError.message}
             </div>
+          )}
 
-            <div className="lg:col-span-5 space-y-6">
-              <NextSessionCard token={token} dtRxLoading={dtRxLoading} dtRx={dtRx} />
-              <StateSnapshot dtState={dtState} />
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              <div className="lg:col-span-7">
+                <LogWorkoutForm
+                  dtLog={dtLog}
+                  updateDtLog={updateDtLog}
+                  signedIn={signedIn}
+                  token={token}
+                  dtLoading={dtLoading}
+                  dtDose={dtDose}
+                  onSubmit={handleDtLog}
+                  onSimulate={handleDtSimulate}
+                  onCrash={handleDtCrash}
+                />
+              </div>
+
+              <div className="lg:col-span-5 space-y-6">
+                <NextSessionCard token={token} dtRxLoading={dtRxLoading} dtRx={dtRx} />
+                <StateSnapshot dtState={dtState} />
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      <PatternPreviewDemo />
-    </motion.div>
+        <PatternPreviewDemo />
+      </motion.div>
+    </div>
   );
 }

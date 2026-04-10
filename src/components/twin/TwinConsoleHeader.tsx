@@ -31,9 +31,9 @@ export function TwinConsoleHeader({
 
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-zinc-400">GOAL</span>
+            <span className="text-xs font-medium text-zinc-200">GOAL</span>
             <Select value={dtGoal} onValueChange={onGoalChange}>
-              <SelectTrigger className="w-40 bg-black/60 border-white/10">
+              <SelectTrigger className="w-40 bg-black/60 border-white/20 text-white">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

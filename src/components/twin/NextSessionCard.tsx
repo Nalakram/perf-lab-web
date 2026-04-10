@@ -33,7 +33,7 @@ export function NextSessionCard({
 
       <CardContent className="space-y-6">
         {!token ? (
-          <div className="text-center py-8 text-zinc-400">
+          <div className="text-center py-8 text-zinc-300">
             Sign in to load your personalized next session
           </div>
         ) : dtRxLoading ? (
@@ -49,14 +49,14 @@ export function NextSessionCard({
               <p className="text-neon-cyan text-sm">{dtRx.focus}</p>
             </div>
 
-            <p className="text-zinc-300 italic">“{dtRx.rationale}”</p>
+            <p className=”text-zinc-100 italic”>”{dtRx.rationale}”</p>
 
             {dtRx.why && (
               <details className="rounded-2xl border border-white/10 bg-black/30 p-4 text-sm">
-                <summary className="cursor-pointer text-zinc-400 font-medium flex items-center gap-2">
+                <summary className="cursor-pointer text-zinc-200 font-medium flex items-center gap-2">
                   Why this session?
                 </summary>
-                <div className="mt-4 text-xs leading-relaxed text-zinc-400 space-y-3">
+                <div className="mt-4 text-xs leading-relaxed text-zinc-300 space-y-3">
                   {dtRx.why.state_drivers && (
                     <div>
                       <span className="text-neon-violet">State drivers:</span>{" "}
@@ -79,7 +79,7 @@ export function NextSessionCard({
             )}
           </motion.div>
         ) : (
-          <div className="text-center py-8 text-zinc-400">
+          <div className="text-center py-8 text-zinc-300">
             Log one workout to generate your first prescription
           </div>
         )}
