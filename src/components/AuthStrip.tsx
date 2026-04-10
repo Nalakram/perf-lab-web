@@ -46,16 +46,16 @@ export function AuthStrip() {
 
   if (isAuthenticated && user) {
     return (
-      <div className="flex w-full flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-md sm:max-w-sm sm:items-end">
+      <div className="flex w-full flex-col gap-3 rounded-2xl border border-white/10 bg-zinc-900/80 backdrop-blur-xl p-4 sm:max-w-sm sm:items-end">
         <div className="flex items-center gap-3 sm:justify-end">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-teal-600 text-xs font-bold text-white shadow-md shadow-teal-900/20">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neon-cyan to-neon-violet text-xs font-bold text-black">
             {user.email.slice(0, 1).toUpperCase()}
           </span>
           <div className="min-w-0 text-left sm:text-right">
-            <p className="text-[0.65rem] font-medium uppercase tracking-wider text-slate-400">
+            <p className="text-[0.65rem] font-medium uppercase tracking-wider text-zinc-400">
               Signed in
             </p>
-            <p className="truncate text-sm font-semibold text-slate-800">{user.email}</p>
+            <p className="truncate text-sm font-semibold text-white">{user.email}</p>
           </div>
         </div>
         <button
@@ -64,7 +64,7 @@ export function AuthStrip() {
             logout();
             setPassword("");
           }}
-          className="btn-secondary w-full sm:w-auto"
+          className="w-full sm:w-auto rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-medium text-white hover:border-neon-cyan/40 transition-colors"
         >
           Log out
         </button>
@@ -74,11 +74,11 @@ export function AuthStrip() {
 
   return (
     <form
-      className="flex w-full max-w-md flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-md sm:items-stretch"
+      className="flex w-full max-w-md flex-col gap-3 rounded-2xl border border-white/10 bg-zinc-900/80 backdrop-blur-xl p-4 sm:items-stretch"
       onSubmit={onLogin}
     >
       {localError ? (
-        <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
+        <p className="rounded-lg border border-rose-400/40 bg-rose-950/60 px-3 py-2 text-xs text-rose-200">
           {localError}
         </p>
       ) : null}
@@ -86,7 +86,7 @@ export function AuthStrip() {
         type="email"
         autoComplete="email"
         placeholder="Email"
-        className="input-control"
+        className="rounded-xl border border-white/15 bg-black/60 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-neon-cyan/50 focus:outline-none"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
@@ -94,7 +94,7 @@ export function AuthStrip() {
         type="password"
         autoComplete="current-password"
         placeholder="Password"
-        className="input-control"
+        className="rounded-xl border border-white/15 bg-black/60 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-neon-cyan/50 focus:outline-none"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
@@ -103,16 +103,16 @@ export function AuthStrip() {
           type="button"
           disabled={isLoading}
           onClick={() => void onRegisterClick()}
-          className="btn-secondary flex-1 min-w-[6rem]"
+          className="flex-1 min-w-[6rem] rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-medium text-white hover:border-neon-cyan/40 disabled:opacity-40 transition-colors"
         >
           Register
         </button>
         <button
           type="submit"
           disabled={isLoading}
-          className="btn-primary flex-1 min-w-[6rem]"
+          className="flex-1 min-w-[6rem] rounded-xl bg-gradient-to-r from-neon-cyan to-neon-violet px-4 py-2 text-sm font-semibold text-black disabled:opacity-40 transition-opacity"
         >
-          {isLoading ? "…" : "Log in"}
+          {isLoading ? "..." : "Log in"}
         </button>
       </div>
     </form>
