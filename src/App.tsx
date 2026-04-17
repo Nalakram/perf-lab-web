@@ -7,6 +7,8 @@ import { AuthStrip } from "./components/AuthStrip";
 import { DigitalTwinPanel } from "./components/DigitalTwinPanel";
 import { EngineExplainer } from "./components/EngineExplainer";
 import { HeroFlowColumn } from "./components/HeroFlowColumn";
+import { OnboardingForm } from "./components/OnboardingForm";
+import { useAuth } from "./auth/useAuth";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL as string;
 
@@ -15,6 +17,11 @@ type MainTab = "field" | "twin";
 export default function App() {
   const year = new Date().getFullYear();
   const [mainTab, setMainTab] = useState<MainTab>("field");
+  const { isAuthenticated, onboardingPending } = useAuth();
+
+  if (isAuthenticated && onboardingPending) {
+    return <OnboardingForm />;
+  }
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">

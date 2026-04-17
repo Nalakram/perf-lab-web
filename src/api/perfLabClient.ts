@@ -2,6 +2,8 @@
 import { notifyUnauthorized } from "../auth/sessionBridge";
 import type {
   ApiError,
+  OnboardRequest,
+  OnboardResponse,
   StressDose,
   TokenResponse,
   UnifiedStateVector,
@@ -161,6 +163,21 @@ export async function logWorkout(
     body: JSON.stringify(log),
   });
   return handleResponse<UnifiedStateVector>(res, { sessionOn401: true });
+}
+
+/**
+ * Onboarding: create athlete profile and seed baseline state.
+ */
+export async function onboard(request: OnboardRequest): Promise<OnboardResponse> {
+  if (!API_V1_BASE) {
+    throw new Error("VITE_API_BASE_URL is not configured (no /v1 base)");
+  }
+  const res = await fetch(`${API_V1_BASE}/onboard`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+  });
+  return handleResponse<OnboardResponse>(res);
 }
 
 /**

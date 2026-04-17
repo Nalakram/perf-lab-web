@@ -7,7 +7,7 @@ import {
 } from "react";
 
 import * as api from "../api/perfLabClient";
-import type { UserResponse } from "../types";
+import type { OnboardRequest, UserResponse } from "../types";
 import { AuthContext, type AuthContextValue } from "./perfLabAuthContext";
 import { setUnauthorizedHandler } from "./sessionBridge";
 import {
@@ -23,6 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserResponse | null>(null);
   const [email, setEmail] = useState(() => getStoredEmail() ?? "");
   const [isLoading, setIsLoading] = useState(false);
+  const [onboardingPending, setOnboardingPending] = useState(false);
 
   const logout = useCallback(() => {
     clearStoredSession();
@@ -79,11 +80,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         await api.register(emailIn, password);
         await login(emailIn, password);
+        setOnboardingPending(true);
       } finally {
         setIsLoading(false);
       }
     },
     [login],
+  );
+
+  const completeOnboarding = useCallback(
+    async (req: Partial<OnboardRequest>) => {
+      const emailToUse = req.email ?? email;
+      try {
+        await api.onboard({ email: emailToUse, ...req });
+      } catch {
+        // Best-effort: baseline state seeds on first /next-session anyway
+      } finally {
+        setOnboardingPending(false);
+      }
+    },
+    [email],
   );
 
   const value = useMemo<AuthContextValue>(
@@ -94,11 +110,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setEmail,
       isAuthenticated: Boolean(token),
       isLoading,
+      onboardingPending,
       login,
       register,
+      completeOnboarding,
       logout,
     }),
-    [token, user, email, isLoading, login, register, logout],
+    [token, user, email, isLoading, onboardingPending, login, register, completeOnboarding, logout],
   );
 
   return (

@@ -70,6 +70,12 @@ export function StateSnapshot({ dtState }: StateSnapshotProps) {
 
             {/* Component F(t) and T(t) sections remain similar but with neon styling */}
             {/* (I kept your original details logic but upgraded the visuals) */}
+
+            {dtState.model_version && (
+              <div className="text-right text-xs text-zinc-600">
+                engine {dtState.model_version}
+              </div>
+            )}
           </>
         )}
       </CardContent>

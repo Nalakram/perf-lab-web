@@ -84,6 +84,7 @@ export interface UnifiedStateVector {
 
   habit_strength: number;
   skill_state: Record<string, number>;
+  model_version: string;
 }
 
 export interface ValidationSummary {
@@ -105,11 +106,21 @@ export interface PrescriptionExplanation {
   structured_template_name?: string | null;
 }
 
+export interface ExercisePrescription {
+  name: string;
+  sets?: number | null;
+  reps?: string | null;
+  load_note?: string | null;
+  weak_point_tags: string[];
+}
+
 export interface WorkoutPrescription {
   type: string;
   focus: string;
   rationale: string;
   duration_min: number;
+  model_version: string;
+  exercises: ExercisePrescription[];
   why?: PrescriptionExplanation | null;
 }
 
@@ -138,4 +149,28 @@ export interface StressDose {
   d_nm_central: number;
   d_struct_damage: number;
   d_struct_signal: number;
+}
+
+/** POST /v1/onboard */
+export interface OnboardRequest {
+  email: string;
+  experience_level?: string;
+  experience_years?: number;
+  available_days_per_week?: number;
+  session_duration_minutes?: number;
+  equipment?: string[];
+  self_reported_weak_points?: string[];
+  goal?: string;
+  squat_1rm_kg?: number | null;
+  deadlift_1rm_kg?: number | null;
+  bench_1rm_kg?: number | null;
+  bodyweight_kg?: number | null;
+  run_5k_seconds?: number | null;
+}
+
+export interface OnboardResponse {
+  user_id: number;
+  profile_id: number;
+  message: string;
+  next_step: string;
 }
