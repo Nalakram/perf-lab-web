@@ -26,6 +26,10 @@ This document exists to make that process predictable.
 | `TissueState` | `engine_vectors.py :: TissueState` | |
 | `StressDoseSix` | `engine_vectors.py :: StressDoseSix` | |
 | `Modality` | `workouts.py :: Modality` (Literal union) | Must match exactly — see below |
+| `BlockGoal` / `BlockStatus` / `SessionStatus` | `mesocycle.py` enums | Planning layer status/goal values |
+| `BlockCreateRequest` / `BlockRead` / `BlockUpdateRequest` | `planning.py` schemas | `/v1/planning/blocks*` |
+| `PlannedSessionRead` / `PlannedSessionUpdateRequest` | `planning.py` schemas | `/v1/planning/sessions*` |
+| `TodaySessionResponse` | `planning.py :: TodaySessionResponse` | `/v1/planning/today` |
 
 ---
 
@@ -49,6 +53,8 @@ if a component ever accesses them.
 | `prescription_branch` | `PrescriptionExplanation` | Not rendered |
 | `structured_template_name` | `PrescriptionExplanation` | Not rendered |
 | `source_alignment` | `PrescriptionExplanation` | Not rendered |
+| `planned_session_id` | `WorkoutLog` request | Internal linkage field; not directly rendered |
+| `is_benchmark` / `benchmark_results` | `WorkoutLog` request | Only surfaced in benchmark flow UI |
 
 ---
 
@@ -109,6 +115,13 @@ goal dropdown (it already uses `TRAINING_GOALS` so only one change is needed).
 3. Update `toApiWorkoutLog()` in `stateUtils.ts` if it needs special
    serialization (e.g. stripping zeros, defaulting undefined)
 
+### Adding a planning schema or endpoint
+
+1. Add new interfaces to `src/types.ts` (planning section)
+2. Add method(s) to `src/api/perfLabClient.ts`
+3. If user-facing, wire to `PlanningPanel.tsx` and/or `DigitalTwinPanel.tsx`
+4. Run `npx tsc --noEmit` and verify no prop/type drift
+
 ### Changing a field name
 
 1. Update `src/types.ts`
@@ -136,6 +149,7 @@ npx tsc --noEmit
 # 4. If new fields were added to WorkoutPrescription, check NextSessionCard.tsx
 #    If new fields were added to UnifiedStateVector, check StateSnapshot.tsx
 #    If new fields were added to OnboardRequest, check OnboardingForm.tsx
+#    If planning schemas changed, check PlanningPanel.tsx + DigitalTwinPanel.tsx
 ```
 
 ---

@@ -27,6 +27,7 @@ This fires after `register()` succeeds. Once `completeOnboarding()` resolves
 **Tab model:**
 - `"field"` → `HeroFlowColumn` (legacy VO₂ field test; no v1 API)
 - `"twin"` → `DigitalTwinPanel` (live training engine)
+- `"planning"` → `PlanningPanel` (block/session planning surface)
 
 ---
 
@@ -47,12 +48,16 @@ handlers defined in this component and passed to children as callbacks.
 | `dtState` | `UnifiedStateVector \| null` | Latest athlete state |
 | `dtRx` | `WorkoutPrescription \| null` | Latest prescription |
 | `dtDose` | `StressDose \| null` | Latest simulated dose |
+| `todaySession` | `PlannedSessionRead \| null` | Today planning slot context |
 | `dtLoading` | `boolean` | `log-workout` in flight |
 | `dtRxLoading` | `boolean` | `next-session` in flight |
 | `dtError` | `ApiError \| null` | Last error |
 
 **Auto-refresh behavior:** On mount (when `signedIn`), on goal change, and
-after any `logWorkout` call, the panel automatically fetches a new prescription.
+after any `logWorkout` call, the panel automatically fetches both:
+- `GET /v1/next-session`
+- `GET /v1/planning/today`
+
 There is a `prevModalityRef` that tracks modality changes to reset
 `dominant_movement_pattern` when the user switches workout type.
 
@@ -82,6 +87,7 @@ gate in `App.tsx`.
 | Bodyweight (kg) | `bodyweight_kg` | Stored in profile |
 | Days per week | `available_days_per_week` | Slider 1–7 |
 | Primary goal | `goal` | Matches `TRAINING_GOALS` |
+| Equipment checklist | `equipment[]` | Used by equipment-aware prescription |
 
 ---
 
@@ -127,7 +133,7 @@ Shows `—` for each card when the corresponding data is null.
 
 ### `NextSessionCard.tsx`
 
-**Props:** `token: string | null`, `dtRxLoading: boolean`, `dtRx: WorkoutPrescription | null`
+**Props:** `token: string | null`, `dtRxLoading: boolean`, `dtRx: WorkoutPrescription | null`, `todaySession: PlannedSessionRead | null`
 
 Displays the current prescription.
 
@@ -141,13 +147,16 @@ Displays the current prescription.
 - `model_version` badge (dim, next to duration badge) — identifies engine version
 - Session type heading + `focus` subheading in neon-cyan
 - Rationale in italic quotes
+- Planning context panel when `todaySession` exists (date/category/modality + deload/benchmark badges)
 - **Exercise list** (`exercises[]`) — only rendered if non-empty. Shows name,
   sets×reps, and load note per exercise
 - **"Why this session?" details** (expandable `<details>`) containing:
   - `why.state_drivers` — comma-separated
   - `why.goal_alignment` — plain text
-  - `why.constraints_applied` — filters for `weak_point:*` entries and renders
-    them as amber chips (e.g. `weak_point:grip` → chip labeled `grip`)
+  - `why.constraints_applied` rendered as grouped chips for:
+    - `weak_point:*`
+    - `equipment:*`
+    - `block:deload`, `block:benchmark`
   - `why.warnings` — amber warning text
 
 **Non-obvious:** The `exercises` list comes from the backend prescriber. It will
@@ -192,7 +201,7 @@ bottom-right corner of the card when `model_version` is present.
 
 ### `LogWorkoutForm.tsx`
 
-**Props:** `dtLog`, `updateDtLog`, `signedIn`, `token`, `dtLoading`, `dtDose`, `onSubmit`, `onSimulate`, `onCrash`
+**Props:** `dtLog`, `updateDtLog`, `todaySession`, `benchmarkKey`, `benchmarkValue`, `onBenchmarkKeyChange`, `onBenchmarkValueChange`, `signedIn`, `token`, `dtLoading`, `dtDose`, `onSubmit`, `onSimulate`, `onCrash`
 
 The workout logging form. All state lives in `DigitalTwinPanel` — this
 component is purely presentational.
@@ -209,10 +218,11 @@ component is purely presentational.
 - Movement pattern (Select — squat, hinge, run, push, pull, etc.)
 - Novelty (0.1–3.0, where >1 = novel / high coordination demand)
 - Estimated sets
+- Benchmark payload controls (only when `todaySession.is_benchmark` is true)
 
 **Three actions:**
 - "Simulate D(t)" → `onSimulate` (calls `POST /v1/simulate-dose`, no state change)
-- "Log & update S(t)" → `onSubmit` (calls `POST /v1/log-workout`, advances state)
+- "Log & update S(t)" → `onSubmit` (calls `POST /v1/log-workout`, advances state; includes `planned_session_id` when available)
 - "Crash S(t)" → `onCrash` (development utility; logs a hard session to
   stress-test the engine)
 
@@ -270,7 +280,7 @@ Four pure helper functions (no side effects):
 | Function | Purpose |
 |---|---|
 | `nowIso()` | Returns `new Date().toISOString()` — used to timestamp new workout logs |
-| `toApiWorkoutLog(log)` | Strips undefined/zero optional fields before sending to API; normalizes `dominant_movement_pattern` to `"mixed"` when blank |
+| `toApiWorkoutLog(log)` | Strips undefined/zero optional fields before sending to API; normalizes `dominant_movement_pattern` to `"mixed"` when blank; forwards planning/benchmark fields |
 | `readinessScore(state)` | Computes 0–100 readiness string from `fatigue_f` + `tissue_t` vectors (see ARCHITECTURE.md for formula) |
 | `isApiError(value)` | Type guard for `ApiError` |
 | `toApiError(err)` | Normalizes any caught value into an `ApiError` |
@@ -278,3 +288,19 @@ Four pure helper functions (no side effects):
 **Non-obvious:** `toApiWorkoutLog()` sets `novelty` to `1` (default) if
 undefined. This is important — a missing `novelty` field could cause the backend
 dose engine to use a different default.
+### `PlanningPanel.tsx`
+
+Planning surface for authenticated users.
+
+**Behavior:**
+- creates blocks via `POST /v1/planning/blocks`
+- lists blocks via `GET /v1/planning/blocks`
+- lists sessions (windowed) via `GET /v1/planning/sessions`
+- updates sessions (`completed` / `skipped` / `rescheduled`) via `PATCH /v1/planning/sessions/{id}`
+
+**Sections rendered:**
+- block create form (goal, start date, duration, sessions/week, deload cadence, benchmark cadence)
+- block summary cards
+- MVP calendar list with action buttons
+
+---

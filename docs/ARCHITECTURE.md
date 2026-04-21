@@ -8,6 +8,7 @@ the [perf-lab-api](https://github.com/Nalakram/perf-lab-api) training engine.
 The UI expresses the backend's control loop directly:
 
 ```
+planning      (block/session orchestration)
 simulate-dose (preview)
 log-workout   (state mutation)
 next-session  (controller output)
@@ -58,6 +59,7 @@ src/
     ├── EngineExplainer.tsx    # Static explainer text
     ├── HeroFlowColumn.tsx     # Legacy field-test / VO₂ calculator (non-v1)
     ├── OnboardingForm.tsx     # Post-registration profile setup form
+    ├── PlanningPanel.tsx      # Block/session planning surface (v1/planning/*)
     ├── PageSection.tsx        # Reusable section wrapper
     └── twin/
         ├── LogWorkoutForm.tsx     # Workout input form
@@ -79,15 +81,15 @@ dependency and no URL-based navigation.
 
 ```
 App.tsx
-└── mainTab: "field" | "twin"
-    ├── "field" → HeroFlowColumn (legacy VO₂ / field test)
-    └── "twin"  → DigitalTwinPanel
+└── mainTab: "field" | "twin" | "planning"
+    ├── "field"    → HeroFlowColumn (legacy VO₂ / field test)
+    ├── "twin"     → DigitalTwinPanel
+    └── "planning" → PlanningPanel
 ```
 
 **Why:** The project is still in a phase where the product shape is evolving.
 Adding routing now would require committing to URL semantics before the page
-structure is stable. A router will be introduced when the block calendar view
-and history view are built (planned in Roadmap Phase 2).
+structure is stable.
 
 ---
 
@@ -152,6 +154,7 @@ dtLog: WorkoutLog                    // current workout form state
 dtState: UnifiedStateVector | null   // latest athlete state from API
 dtRx: WorkoutPrescription | null     // latest prescription from API
 dtDose: StressDose | null            // latest simulated dose
+todaySession: PlannedSessionRead|null // today planning slot context
 dtLoading: boolean                   // log-workout in flight
 dtRxLoading: boolean                 // next-session in flight
 dtError: ApiError | null             // last API error
@@ -173,6 +176,10 @@ export async function getNextSession(goal: string, token: string): Promise<Worko
 export async function logWorkout(log: WorkoutLog, token: string): Promise<UnifiedStateVector>
 export async function simulateDose(log: WorkoutLog): Promise<StressDose>
 export async function onboard(request: OnboardRequest): Promise<OnboardResponse>
+export async function createPlanningBlock(body: BlockCreateRequest, token: string): Promise<BlockRead>
+export async function listPlanningBlocks(token: string): Promise<BlockRead[]>
+export async function listPlannedSessions(token: string, params?): Promise<PlannedSessionRead[]>
+export async function getTodayPlannedSession(goal: string, token: string): Promise<TodaySessionResponse>
 ```
 
 **Key behaviors:**
@@ -194,7 +201,8 @@ The standard training loop in `DigitalTwinPanel`:
 ```
 1. Mount / goal change
    → GET /v1/next-session?goal={goal}
-   → setDtRx(prescription)
+   → GET /v1/planning/today?goal={goal}
+   → setDtRx(prescription), setTodaySession(session|null)
 
 2. User fills LogWorkoutForm + clicks "Simulate D(t)"
    → POST /v1/simulate-dose
@@ -202,17 +210,20 @@ The standard training loop in `DigitalTwinPanel`:
 
 3. User clicks "Log & update S(t)"
    → POST /v1/log-workout
+     (includes planned_session_id when today slot exists)
    → setDtState(newState)
    → GET /v1/next-session         [auto-refresh]
-   → setDtRx(updatedPrescription)
+   → GET /v1/planning/today       [auto-refresh]
+   → setDtRx(updatedPrescription), setTodaySession(updated)
 
 4. User clicks "Refresh u(t)"
    → GET /v1/next-session
    → setDtRx(prescription)
 ```
 
-This maps exactly to the backend's three-endpoint design:
-`simulate-dose` (pure), `log-workout` (mutating), `next-session` (controller output).
+This maps to the backend planning + twin design:
+`planning/*` (orchestration), `simulate-dose` (pure),
+`log-workout` (mutating), `next-session` (controller output).
 
 ---
 
