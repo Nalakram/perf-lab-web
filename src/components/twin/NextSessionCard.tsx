@@ -1,6 +1,6 @@
 // src/components/twin/NextSessionCard.tsx
 import { motion } from "framer-motion";
-import type { WorkoutPrescription } from "../../types";
+import type { PlannedSessionRead, WorkoutPrescription } from "../../types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -8,13 +8,24 @@ type NextSessionCardProps = {
   token: string | null;
   dtRxLoading: boolean;
   dtRx: WorkoutPrescription | null;
+  todaySession: PlannedSessionRead | null;
 };
 
 export function NextSessionCard({
   token,
   dtRxLoading,
   dtRx,
+  todaySession,
 }: NextSessionCardProps) {
+  const weakPointConstraints =
+    dtRx?.why?.constraints_applied?.filter((c) => c.startsWith("weak_point:")) ?? [];
+  const planningConstraints =
+    dtRx?.why?.constraints_applied?.filter(
+      (c) => c === "block:deload" || c === "block:benchmark",
+    ) ?? [];
+  const equipmentConstraints =
+    dtRx?.why?.constraints_applied?.filter((c) => c.startsWith("equipment:")) ?? [];
+
   return (
     <Card className="border-white/10 bg-zinc-900/70 backdrop-blur-2xl overflow-hidden">
       <CardHeader className="pb-4">
@@ -57,6 +68,19 @@ export function NextSessionCard({
 
             <p className="text-zinc-100 italic">{`"${dtRx.rationale}"`}</p>
 
+            {todaySession && (
+              <div className="rounded-xl border border-white/10 bg-black/20 p-3 text-xs text-zinc-200 space-y-2">
+                <div className="font-semibold text-zinc-100">Planning Context</div>
+                <div>
+                  {todaySession.scheduled_date} • {todaySession.category} • {todaySession.modality}
+                </div>
+                <div className="flex gap-1">
+                  {todaySession.is_deload && <Badge className="bg-amber-900/40 text-amber-300">Deload</Badge>}
+                  {todaySession.is_benchmark && <Badge className="bg-violet-900/40 text-violet-300">Benchmark</Badge>}
+                </div>
+              </div>
+            )}
+
             {dtRx.exercises && dtRx.exercises.length > 0 && (
               <ul className="space-y-1 text-sm border border-white/10 rounded-xl p-3 bg-black/20">
                 {dtRx.exercises.map((ex, i) => (
@@ -91,17 +115,39 @@ export function NextSessionCard({
                       {dtRx.why.goal_alignment}
                     </div>
                   )}
-                  {dtRx.why.constraints_applied && dtRx.why.constraints_applied.filter(c => c.startsWith("weak_point:")).length > 0 && (
+                  {weakPointConstraints.length > 0 && (
                     <div>
                       <span className="text-neon-violet">Weak points:</span>{" "}
                       <span className="flex flex-wrap gap-1 mt-1">
-                        {dtRx.why.constraints_applied
-                          .filter(c => c.startsWith("weak_point:"))
-                          .map(c => (
+                        {weakPointConstraints.map(c => (
                             <span key={c} className="text-xs bg-amber-900/30 text-amber-300 rounded px-1.5 py-0.5">
                               {c.replace("weak_point:", "")}
                             </span>
                           ))}
+                      </span>
+                    </div>
+                  )}
+                  {planningConstraints.length > 0 && (
+                    <div>
+                      <span className="text-neon-violet">Block constraints:</span>{" "}
+                      <span className="flex flex-wrap gap-1 mt-1">
+                        {planningConstraints.map((c) => (
+                          <span key={c} className="text-xs bg-cyan-900/30 text-cyan-300 rounded px-1.5 py-0.5">
+                            {c.replace("block:", "")}
+                          </span>
+                        ))}
+                      </span>
+                    </div>
+                  )}
+                  {equipmentConstraints.length > 0 && (
+                    <div>
+                      <span className="text-neon-violet">Equipment:</span>{" "}
+                      <span className="flex flex-wrap gap-1 mt-1">
+                        {equipmentConstraints.map((c) => (
+                          <span key={c} className="text-xs bg-emerald-900/30 text-emerald-300 rounded px-1.5 py-0.5">
+                            {c.replace("equipment:", "")}
+                          </span>
+                        ))}
                       </span>
                     </div>
                   )}

@@ -6,16 +6,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "../auth/useAuth";
 import {
   getNextSession,
+  getTodayPlannedSession,
   logWorkout as logDtWorkout,
   simulateDose,
 } from "../api/perfLabClient";
 
 import type {
-  WorkoutLog,
-  UnifiedStateVector,
-  WorkoutPrescription,
-  StressDose,
   ApiError,
+  PlannedSessionRead,
+  StressDose,
+  UnifiedStateVector,
+  WorkoutLog,
+  WorkoutPrescription,
 } from "../types";
 
 import { LogWorkoutForm } from "./twin/LogWorkoutForm";
@@ -52,9 +54,12 @@ export function DigitalTwinPanel() {
   const [dtState, setDtState] = useState<UnifiedStateVector | null>(null);
   const [dtRx, setDtRx] = useState<WorkoutPrescription | null>(null);
   const [dtDose, setDtDose] = useState<StressDose | null>(null);
+  const [todaySession, setTodaySession] = useState<PlannedSessionRead | null>(null);
   const [dtLoading, setDtLoading] = useState(false);
   const [dtRxLoading, setDtRxLoading] = useState(false);
   const [dtError, setDtError] = useState<ApiError | null>(null);
+  const [benchmarkKey, setBenchmarkKey] = useState("periodic_retest");
+  const [benchmarkValue, setBenchmarkValue] = useState<string>("");
 
   const prevModalityRef = useRef(dtLog.modality);
 
@@ -69,28 +74,64 @@ export function DigitalTwinPanel() {
     prevModalityRef.current = dtLog.modality;
   }, [dtLog.modality, dtLog.dominant_movement_pattern]);
 
+  async function refreshTwinContext(goal: string, authToken: string): Promise<void> {
+    const [rx, today] = await Promise.all([
+      getNextSession(goal, authToken),
+      getTodayPlannedSession(goal, authToken),
+    ]);
+    setDtRx(rx);
+    setTodaySession(today.session);
+  }
+
   useEffect(() => {
     let cancelled = false;
     const loadRx = async () => {
       if (!token) {
         setDtRx(null);
+        setTodaySession(null);
         setDtRxLoading(false);
         return;
       }
       setDtRxLoading(true);
       setDtError(null);
       try {
-        const rx = await getNextSession(dtGoal, token);
-        if (!cancelled) setDtRx(rx);
+        const [rx, today] = await Promise.all([
+          getNextSession(dtGoal, token),
+          getTodayPlannedSession(dtGoal, token),
+        ]);
+        if (!cancelled) {
+          setDtRx(rx);
+          setTodaySession(today.session);
+        }
       } catch (err: unknown) {
-        if (!cancelled) setDtError(toApiError(err));
+        // graceful fallback when planning endpoint is unavailable
+        try {
+          const rx = await getNextSession(dtGoal, token);
+          if (!cancelled) setDtRx(rx);
+        } catch (err2: unknown) {
+          if (!cancelled) setDtError(toApiError(err2));
+        }
       } finally {
         if (!cancelled) setDtRxLoading(false);
       }
     };
     void loadRx();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [dtGoal, token]);
+
+  useEffect(() => {
+    if (!todaySession) return;
+    setDtLog((prev) => ({
+      ...prev,
+      planned_session_id: todaySession.id,
+      is_benchmark: todaySession.is_benchmark,
+    }));
+    if (!todaySession.is_benchmark) {
+      setBenchmarkValue("");
+    }
+  }, [todaySession]);
 
   function updateDtLog(field: keyof WorkoutLog, value: unknown) {
     setDtLog((prev) => ({ ...prev, [field]: value }));
@@ -103,13 +144,21 @@ export function DigitalTwinPanel() {
     setDtError(null);
     setDtDose(null);
     try {
-      const newState = await logDtWorkout(
-        toApiWorkoutLog({ ...dtLog, timestamp: nowIso() }),
-        token,
-      );
+      const payload = toApiWorkoutLog({
+        ...dtLog,
+        timestamp: nowIso(),
+        planned_session_id: todaySession?.id,
+        is_benchmark: Boolean(todaySession?.is_benchmark && dtLog.is_benchmark),
+        benchmark_results:
+          todaySession?.is_benchmark &&
+          dtLog.is_benchmark &&
+          benchmarkValue.trim() !== ""
+            ? { [benchmarkKey || "periodic_retest"]: Number(benchmarkValue) }
+            : undefined,
+      });
+      const newState = await logDtWorkout(payload, token);
       setDtState(newState);
-      const rx = await getNextSession(dtGoal, token);
-      setDtRx(rx);
+      await refreshTwinContext(dtGoal, token);
     } catch (err: unknown) {
       setDtError(toApiError(err));
     } finally {
@@ -143,12 +192,12 @@ export function DigitalTwinPanel() {
       avg_rir: 0,
       dominant_movement_pattern: "mixed",
       novelty: 1,
+      planned_session_id: todaySession?.id,
     };
     try {
       const newState = await logDtWorkout(toApiWorkoutLog(crash), token);
       setDtState(newState);
-      const rx = await getNextSession(dtGoal, token);
-      setDtRx(rx);
+      await refreshTwinContext(dtGoal, token);
     } catch (err: unknown) {
       setDtError(toApiError(err));
     } finally {
@@ -161,8 +210,7 @@ export function DigitalTwinPanel() {
     setDtRxLoading(true);
     setDtError(null);
     try {
-      const rx = await getNextSession(dtGoal, token);
-      setDtRx(rx);
+      await refreshTwinContext(dtGoal, token);
     } catch (err: unknown) {
       setDtError(toApiError(err));
     } finally {
@@ -177,7 +225,6 @@ export function DigitalTwinPanel() {
 
   return (
     <div className="relative min-h-[calc(100vh-200px)] bg-black">
-      {/* Cyberpunk scanline background */}
       <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,#00f5ff10_0px,#00f5ff10_1px,transparent_1px,transparent_4px)] pointer-events-none opacity-30" />
 
       <motion.div
@@ -207,6 +254,11 @@ export function DigitalTwinPanel() {
                 <LogWorkoutForm
                   dtLog={dtLog}
                   updateDtLog={updateDtLog}
+                  todaySession={todaySession}
+                  benchmarkKey={benchmarkKey}
+                  benchmarkValue={benchmarkValue}
+                  onBenchmarkKeyChange={setBenchmarkKey}
+                  onBenchmarkValueChange={setBenchmarkValue}
                   signedIn={signedIn}
                   token={token}
                   dtLoading={dtLoading}
@@ -218,7 +270,7 @@ export function DigitalTwinPanel() {
               </div>
 
               <div className="lg:col-span-5 space-y-6">
-                <NextSessionCard token={token} dtRxLoading={dtRxLoading} dtRx={dtRx} />
+                <NextSessionCard token={token} dtRxLoading={dtRxLoading} dtRx={dtRx} todaySession={todaySession} />
                 <StateSnapshot dtState={dtState} />
               </div>
             </div>
@@ -230,3 +282,4 @@ export function DigitalTwinPanel() {
     </div>
   );
 }
+

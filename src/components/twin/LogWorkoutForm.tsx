@@ -1,6 +1,6 @@
 // src/components/twin/LogWorkoutForm.tsx
 import { motion } from "framer-motion";
-import type { Modality, StressDose, WorkoutLog } from "../../types";
+import type { Modality, PlannedSessionRead, StressDose, WorkoutLog } from "../../types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -17,6 +17,11 @@ const MOVEMENT_PATTERN_OPTIONS = [
 type LogWorkoutFormProps = {
   dtLog: WorkoutLog;
   updateDtLog: (field: keyof WorkoutLog, value: unknown) => void;
+  todaySession: PlannedSessionRead | null;
+  benchmarkKey: string;
+  benchmarkValue: string;
+  onBenchmarkKeyChange: (v: string) => void;
+  onBenchmarkValueChange: (v: string) => void;
   signedIn: boolean;
   token: string | null;
   dtLoading: boolean;
@@ -29,6 +34,11 @@ type LogWorkoutFormProps = {
 export function LogWorkoutForm({
   dtLog,
   updateDtLog,
+  todaySession,
+  benchmarkKey,
+  benchmarkValue,
+  onBenchmarkKeyChange,
+  onBenchmarkValueChange,
   signedIn,
   token,
   dtLoading,
@@ -49,6 +59,11 @@ export function LogWorkoutForm({
             <h3 className="text-lg font-semibold tracking-tight text-white">
               Log Workout
             </h3>
+            {todaySession && (
+              <div className="text-xs text-zinc-300 border border-zinc-700 rounded-lg px-2 py-1">
+                Today: {todaySession.category} ({todaySession.scheduled_date})
+              </div>
+            )}
             {!signedIn && (
               <Badge variant="outline" className="text-amber-400 border-amber-400/30">
                 Demo Mode
@@ -192,6 +207,48 @@ export function LogWorkoutForm({
                 placeholder="—"
               />
             </div>
+
+            {todaySession?.is_benchmark && (
+              <div className="rounded-xl border border-violet-400/40 bg-violet-950/20 p-4 space-y-3">
+                <div className="text-xs font-semibold uppercase tracking-wider text-violet-300">
+                  Benchmark Session Payload
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    id="is-benchmark"
+                    type="checkbox"
+                    checked={Boolean(dtLog.is_benchmark)}
+                    onChange={(e) => updateDtLog("is_benchmark", e.target.checked)}
+                  />
+                  <Label htmlFor="is-benchmark" className="text-zinc-200 text-xs">
+                    Send benchmark payload with this log
+                  </Label>
+                </div>
+                {dtLog.is_benchmark && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="text-zinc-200 text-xs">Benchmark Key</Label>
+                      <Input
+                        value={benchmarkKey}
+                        onChange={(e) => onBenchmarkKeyChange(e.target.value)}
+                        className="bg-black/60 border-white/20 text-white"
+                        placeholder="periodic_retest"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-zinc-200 text-xs">Result Value</Label>
+                      <Input
+                        type="number"
+                        value={benchmarkValue}
+                        onChange={(e) => onBenchmarkValueChange(e.target.value)}
+                        className="bg-black/60 border-white/20 text-white"
+                        placeholder="e.g. 120"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex gap-3 pt-4">

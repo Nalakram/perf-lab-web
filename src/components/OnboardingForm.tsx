@@ -17,6 +17,19 @@ const EXPERIENCE_LEVELS = [
   { value: "elite", label: "Elite" },
 ] as const;
 
+const EQUIPMENT_OPTIONS = [
+  "barbell",
+  "dumbbells",
+  "kettlebell",
+  "pullup_bar",
+  "cable",
+  "machine",
+  "rower",
+  "assault_bike",
+  "rings",
+  "band",
+] as const;
+
 export function OnboardingForm() {
   const { email, completeOnboarding } = useAuth();
 
@@ -28,6 +41,7 @@ export function OnboardingForm() {
   const [bodyweight, setBodyweight] = useState("");
   const [daysPerWeek, setDaysPerWeek] = useState(3);
   const [goal, setGoal] = useState("Strength");
+  const [equipment, setEquipment] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const parseOptionalKg = (val: string): number | null =>
@@ -42,6 +56,7 @@ export function OnboardingForm() {
       experience_years: experienceYears ? parseFloat(experienceYears) : undefined,
       available_days_per_week: daysPerWeek,
       goal,
+      equipment,
       squat_1rm_kg: parseOptionalKg(squat1rm),
       deadlift_1rm_kg: parseOptionalKg(deadlift1rm),
       bench_1rm_kg: parseOptionalKg(bench1rm),
@@ -53,8 +68,14 @@ export function OnboardingForm() {
 
   const handleSkip = async () => {
     setIsSubmitting(true);
-    await completeOnboarding({ email, experience_level: "intermediate" });
+    await completeOnboarding({ email, experience_level: "intermediate", equipment });
     setIsSubmitting(false);
+  };
+
+  const toggleEquipment = (item: string) => {
+    setEquipment((prev) =>
+      prev.includes(item) ? prev.filter((x) => x !== item) : [...prev, item],
+    );
   };
 
   return (
@@ -180,6 +201,31 @@ export function OnboardingForm() {
                       </SelectContent>
                     </Select>
                   </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500">
+                  Available Equipment
+                </h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {EQUIPMENT_OPTIONS.map((item) => {
+                    const selected = equipment.includes(item);
+                    return (
+                      <button
+                        key={item}
+                        type="button"
+                        onClick={() => toggleEquipment(item)}
+                        className={`rounded-lg border px-3 py-2 text-xs text-left transition ${
+                          selected
+                            ? "border-neon-cyan bg-neon-cyan/15 text-neon-cyan"
+                            : "border-white/10 bg-zinc-800 text-zinc-300 hover:border-white/30"
+                        }`}
+                      >
+                        {item.replace(/_/g, " ")}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 

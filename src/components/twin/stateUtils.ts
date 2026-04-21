@@ -28,6 +28,15 @@ export function toApiWorkoutLog(log: WorkoutLog): WorkoutLog {
   if (log.estimated_sets !== undefined) {
     base.estimated_sets = log.estimated_sets;
   }
+  if (log.planned_session_id !== undefined) {
+    base.planned_session_id = log.planned_session_id;
+  }
+  if (log.is_benchmark !== undefined) {
+    base.is_benchmark = log.is_benchmark;
+  }
+  if (log.benchmark_results && Object.keys(log.benchmark_results).length > 0) {
+    base.benchmark_results = log.benchmark_results;
+  }
   return base;
 }
 

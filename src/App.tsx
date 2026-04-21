@@ -8,11 +8,12 @@ import { DigitalTwinPanel } from "./components/DigitalTwinPanel";
 import { EngineExplainer } from "./components/EngineExplainer";
 import { HeroFlowColumn } from "./components/HeroFlowColumn";
 import { OnboardingForm } from "./components/OnboardingForm";
+import { PlanningPanel } from "./components/PlanningPanel";
 import { useAuth } from "./auth/useAuth";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL as string;
 
-type MainTab = "field" | "twin";
+type MainTab = "field" | "twin" | "planning";
 
 export default function App() {
   const year = new Date().getFullYear();
@@ -61,12 +62,15 @@ export default function App() {
         {/* Premium tabs */}
         <div className="mx-auto max-w-screen-2xl px-6">
           <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as MainTab)}>
-            <TabsList className="grid w-full max-w-md grid-cols-2 bg-zinc-900 border border-white/10">
+            <TabsList className="grid w-full max-w-xl grid-cols-3 bg-zinc-900 border border-white/10">
               <TabsTrigger value="field" className="data-[state=active]:bg-neon-cyan data-[state=active]:text-black">
                 FIELD TEST
               </TabsTrigger>
               <TabsTrigger value="twin" className="data-[state=active]:bg-neon-cyan data-[state=active]:text-black">
                 DIGITAL TWIN
+              </TabsTrigger>
+              <TabsTrigger value="planning" className="data-[state=active]:bg-neon-cyan data-[state=active]:text-black">
+                PLANNING
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -83,11 +87,9 @@ export default function App() {
           transition={{ duration: 0.4 }}
           className="mt-8"
         >
-          {mainTab === "field" ? (
-            <HeroFlowColumn apiBase={API_BASE} />
-          ) : (
-            <DigitalTwinPanel />
-          )}
+          {mainTab === "field" && <HeroFlowColumn apiBase={API_BASE} />}
+          {mainTab === "twin" && <DigitalTwinPanel />}
+          {mainTab === "planning" && <PlanningPanel />}
         </motion.div>
       </main>
 

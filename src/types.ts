@@ -140,6 +140,9 @@ export interface WorkoutLog {
   dominant_movement_pattern?: string;
   novelty?: number;
   estimated_sets?: number;
+  planned_session_id?: number;
+  is_benchmark?: boolean;
+  benchmark_results?: Record<string, number>;
 }
 
 export interface StressDose {
@@ -173,4 +176,87 @@ export interface OnboardResponse {
   profile_id: number;
   message: string;
   next_step: string;
+}
+
+export type BlockGoal =
+  | "Strength"
+  | "Hypertrophy"
+  | "Power"
+  | "Hyrox"
+  | "CrossFit"
+  | "Running"
+  | "Calisthenics"
+  | "General"
+  | "Recomp";
+
+export type BlockStatus = "active" | "completed" | "abandoned";
+export type SessionStatus = "pending" | "completed" | "skipped" | "rescheduled";
+
+export interface WeeklyTemplateSlot {
+  day_of_week: number;
+  category: string;
+  modality: string;
+}
+
+export interface BlockCreateRequest {
+  goal: BlockGoal;
+  start_date: string;
+  duration_weeks?: number;
+  sessions_per_week?: number;
+  weekly_template?: WeeklyTemplateSlot[];
+  modality_mix?: Record<string, number>;
+  rationale?: string;
+  deload_every_n_weeks?: number;
+  deload_volume_factor?: number;
+  benchmark_every_n_weeks?: number;
+}
+
+export interface BlockRead {
+  id: number;
+  user_id: number;
+  goal: BlockGoal;
+  status: BlockStatus;
+  start_date: string;
+  end_date: string | null;
+  duration_weeks: number;
+  sessions_per_week: number;
+  weekly_template: Record<string, unknown>[];
+  modality_mix: Record<string, unknown>;
+  rationale: string | null;
+  deload_every_n_weeks: number;
+  deload_volume_factor: number;
+  created_at: string;
+}
+
+export interface BlockUpdateRequest {
+  status?: BlockStatus;
+  rationale?: string;
+}
+
+export interface PlannedSessionRead {
+  id: number;
+  block_id: number;
+  user_id: number;
+  scheduled_date: string;
+  week_number: number;
+  day_of_week: number;
+  category: string;
+  modality: string;
+  status: SessionStatus;
+  is_deload: boolean;
+  is_benchmark: boolean;
+  benchmark_key?: string | null;
+  prescribed_content?: Record<string, unknown> | null;
+  workout_log_id?: number | null;
+  completed_at?: string | null;
+}
+
+export interface PlannedSessionUpdateRequest {
+  status?: SessionStatus;
+  scheduled_date?: string;
+}
+
+export interface TodaySessionResponse {
+  session: PlannedSessionRead | null;
+  prescription: Record<string, unknown> | null;
 }

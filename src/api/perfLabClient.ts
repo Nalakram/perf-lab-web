@@ -2,10 +2,16 @@
 import { notifyUnauthorized } from "../auth/sessionBridge";
 import type {
   ApiError,
+  BlockCreateRequest,
+  BlockRead,
+  BlockUpdateRequest,
   OnboardRequest,
   OnboardResponse,
+  PlannedSessionRead,
+  PlannedSessionUpdateRequest,
   StressDose,
   TokenResponse,
+  TodaySessionResponse,
   UnifiedStateVector,
   UserResponse,
   WorkoutLog,
@@ -193,4 +199,81 @@ export async function simulateDose(log: WorkoutLog): Promise<StressDose> {
     body: JSON.stringify(log),
   });
   return handleResponse<StressDose>(res);
+}
+
+export async function createPlanningBlock(
+  body: BlockCreateRequest,
+  token: string,
+): Promise<BlockRead> {
+  if (!API_V1_BASE) throw new Error("VITE_API_BASE_URL is not configured (no /v1 base)");
+  const res = await fetch(`${API_V1_BASE}/planning/blocks`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...authHeaders(token) },
+    body: JSON.stringify(body),
+  });
+  return handleResponse<BlockRead>(res, { sessionOn401: true });
+}
+
+export async function listPlanningBlocks(token: string): Promise<BlockRead[]> {
+  if (!API_V1_BASE) throw new Error("VITE_API_BASE_URL is not configured (no /v1 base)");
+  const res = await fetch(`${API_V1_BASE}/planning/blocks`, {
+    headers: { ...authHeaders(token) },
+  });
+  return handleResponse<BlockRead[]>(res, { sessionOn401: true });
+}
+
+export async function updatePlanningBlock(
+  blockId: number,
+  body: BlockUpdateRequest,
+  token: string,
+): Promise<BlockRead> {
+  if (!API_V1_BASE) throw new Error("VITE_API_BASE_URL is not configured (no /v1 base)");
+  const res = await fetch(`${API_V1_BASE}/planning/blocks/${blockId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...authHeaders(token) },
+    body: JSON.stringify(body),
+  });
+  return handleResponse<BlockRead>(res, { sessionOn401: true });
+}
+
+type SessionListParams = {
+  start_date?: string;
+  end_date?: string;
+};
+
+export async function listPlannedSessions(
+  token: string,
+  params?: SessionListParams,
+): Promise<PlannedSessionRead[]> {
+  if (!API_V1_BASE) throw new Error("VITE_API_BASE_URL is not configured (no /v1 base)");
+  const query = new URLSearchParams();
+  if (params?.start_date) query.set("start_date", params.start_date);
+  if (params?.end_date) query.set("end_date", params.end_date);
+  const url = `${API_V1_BASE}/planning/sessions${query.toString() ? `?${query.toString()}` : ""}`;
+  const res = await fetch(url, { headers: { ...authHeaders(token) } });
+  return handleResponse<PlannedSessionRead[]>(res, { sessionOn401: true });
+}
+
+export async function updatePlannedSession(
+  sessionId: number,
+  body: PlannedSessionUpdateRequest,
+  token: string,
+): Promise<PlannedSessionRead> {
+  if (!API_V1_BASE) throw new Error("VITE_API_BASE_URL is not configured (no /v1 base)");
+  const res = await fetch(`${API_V1_BASE}/planning/sessions/${sessionId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...authHeaders(token) },
+    body: JSON.stringify(body),
+  });
+  return handleResponse<PlannedSessionRead>(res, { sessionOn401: true });
+}
+
+export async function getTodayPlannedSession(
+  goal: string,
+  token: string,
+): Promise<TodaySessionResponse> {
+  if (!API_V1_BASE) throw new Error("VITE_API_BASE_URL is not configured (no /v1 base)");
+  const url = `${API_V1_BASE}/planning/today?goal=${encodeURIComponent(goal)}`;
+  const res = await fetch(url, { headers: { ...authHeaders(token) } });
+  return handleResponse<TodaySessionResponse>(res, { sessionOn401: true });
 }
